@@ -7,11 +7,12 @@ namespace KoruzApi.Controllers;
 [Route("api/[controller]")]
 public class AdminController : ControllerBase
 {
-    private static readonly Dictionary<string, (string Email, string Password)> DefaultAdmins = new(StringComparer.OrdinalIgnoreCase)
+    private readonly IConfiguration _configuration;
+
+    public AdminController(IConfiguration configuration)
     {
-        ["akutagwa"] = ("umarhon3005@gmail.com", "5755Dazai!"),
-        ["bekzod"] = ("example@gmail.com", "1111Bekzod!")
-    };
+        _configuration = configuration;
+    }
 
     [HttpPost("login")]
     public ActionResult<object> Login([FromBody] AdminLoginRequest request)
@@ -23,14 +24,16 @@ public class AdminController : ControllerBase
 
         var username = request.Username.Trim();
 
-        if (!DefaultAdmins.TryGetValue(username, out var admin))
+        var adminSection = _configuration.GetSection($"Admins:{username}");
+        if (!adminSection.Exists())
         {
             return Unauthorized(new { message = "Invalid username or password." });
         }
 
-        var isValid = request.Password == admin.Password;
+        var expectedPassword = adminSection["Password"];
+        var email = adminSection["Email"] ?? string.Empty;
 
-        if (!isValid)
+        if (string.IsNullOrEmpty(expectedPassword) || request.Password != expectedPassword)
         {
             return Unauthorized(new { message = "Invalid username or password." });
         }
@@ -42,7 +45,7 @@ public class AdminController : ControllerBase
             user = new
             {
                 username = username,
-                email = admin.Email
+                email = email
             }
         });
     }
