@@ -1,0 +1,21 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Logs
+*.log
+koruzapi.*.log
+
+## OS
+.DS_Store
+Thumbs.db
+
+## IDE
+.vs/
+.idea/
+*.swp
+*.sw?
