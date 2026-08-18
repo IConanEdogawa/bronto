@@ -1,0 +1,19 @@
+[Unit]
+Description=KoruzApi (.NET)
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/KoruzApi/publish
+ExecStart=/root/.dotnet/dotnet /var/www/KoruzApi/publish/KoruzApi.dll
+Restart=always
+RestartSec=3
+User=root
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5140
+Environment=Database__DataDirectory=/var/www/KoruzApi_Data
+# Set real passwords on the server (do not commit them):
+# Environment=Admins__akutagwa__Password=your_password_here
+# Environment=Admins__bekzod__Password=your_password_here
+
+[Install]
+WantedBy=multi-user.target
