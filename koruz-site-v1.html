@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KORUZ — Direct Sourcing from South Korea</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0B0C;
+    --surface:#131315;
+    --surface-2:#18181B;
+    --line:rgba(255,255,255,.08);
+    --text:#E8E8EA;
+    --muted:#8E8E93;
+    --dim:#5A5A5F;
+    --white:#FFFFFF;
+    --font-display:'Archivo',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+    --font-kr:'IBM Plex Sans KR',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-display);
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  html[lang="ko"] body{font-family:var(--font-kr)}
+  html[lang="ko"] .display{font-family:var(--font-kr);font-stretch:normal;letter-spacing:-0.01em;font-weight:700}
+
+  ::selection{background:var(--text);color:var(--bg)}
+
+  .mono{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .display{font-stretch:115%;font-weight:800;letter-spacing:-0.02em;line-height:1.02;text-transform:uppercase}
+
+  .container{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    border-bottom:1px solid var(--line);
+    background:rgba(11,11,12,.72);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  .nav-inner{
+    max-width:1180px;margin:0 auto;padding:0 24px;
+    height:64px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .wordmark{
+    font-stretch:120%;font-weight:900;letter-spacing:.06em;
+    font-size:1.05rem;color:var(--white);text-decoration:none;text-transform:uppercase;
+  }
+  .wordmark span{color:var(--dim)}
+  .nav-links{display:flex;gap:32px;align-items:center}
+  .nav-links a{
+    color:var(--muted);text-decoration:none;font-size:.85rem;
+    transition:color .3s ease;
+  }
+  .nav-links a:hover,.nav-links a:focus-visible{color:var(--white)}
+  .lang-toggle{
+    display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden;
+  }
+  .lang-toggle button{
+    background:transparent;border:0;color:var(--dim);cursor:pointer;
+    font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;
+    padding:7px 12px;transition:color .3s,background .3s;
+  }
+  .lang-toggle button.active{background:var(--text);color:var(--bg)}
+  .lang-toggle button:not(.active):hover{color:var(--text)}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+    outline:1px solid var(--text);outline-offset:2px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;min-height:100vh;
+    display:flex;align-items:center;
+    border-bottom:1px solid var(--line);
+  }
+  #hero-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .hero-content{position:relative;z-index:2;padding-top:64px}
+  .hero h1{
+    font-size:clamp(2.6rem,8vw,6.4rem);
+    max-width:13ch;color:var(--white);
+    margin:20px 0 28px;
+  }
+  .hero-sub{max-width:46ch;color:var(--muted);font-size:1.05rem;margin-bottom:40px}
+  .hero-meta{
+    display:flex;gap:28px;flex-wrap:wrap;margin-top:56px;
+  }
+  .hero-meta div{color:var(--dim)}
+
+  .btn{
+    display:inline-block;background:var(--text);color:var(--bg);
+    text-decoration:none;font-weight:600;font-size:.9rem;
+    padding:15px 34px;border:1px solid var(--text);border-radius:2px;
+    transition:background .3s ease,color .3s ease;
+  }
+  .btn:hover,.btn:focus-visible{background:transparent;color:var(--text)}
+  .btn-ghost{
+    background:transparent;color:var(--text);margin-left:12px;
+  }
+  .btn-ghost:hover,.btn-ghost:focus-visible{background:var(--text);color:var(--bg)}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:110px 0}
+  .section-head{margin-bottom:56px}
+  .section-head h2{
+    font-size:clamp(1.8rem,4vw,3rem);color:var(--white);margin-top:14px;
+  }
+
+  /* ---------- CATEGORIES ---------- */
+  .cat-grid{
+    display:grid;grid-template-columns:1fr 1fr;
+    border:1px solid var(--line);
+  }
+  .cat-card{
+    position:relative;padding:36px 32px 32px;
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    transition:background .4s ease;
+  }
+  .cat-card:nth-child(2n){border-right:0}
+  .cat-card:nth-child(n+3){border-bottom:0}
+  .cat-card:hover{background:var(--surface)}
+  .cat-card canvas{width:100%;height:190px;display:block;margin-bottom:22px}
+  .logo-marquee{
+    width:100%;height:190px;display:flex;flex-direction:column;justify-content:center;
+    gap:14px;margin-bottom:22px;overflow:hidden;
+    padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:
+      linear-gradient(90deg, rgba(11,11,12,.98), rgba(11,11,12,0) 12%, rgba(11,11,12,0) 88%, rgba(11,11,12,.98)),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+  }
+  .logo-track{
+    display:flex;align-items:center;gap:26px;white-space:nowrap;width:max-content;
+    animation:logo-scroll 44s linear infinite;
+    will-change:transform;
+  }
+  .logo-track.reverse{animation-direction:reverse;animation-duration:52s}
+  .logo-marquee:hover .logo-track,
+  .logo-marquee:focus-within .logo-track{
+    animation-play-state:paused;
+  }
+  .logo-set{display:flex;align-items:center;gap:26px}
+  .logo-chip{
+    display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+    color:var(--white);font-size:1.02rem;letter-spacing:.02em;line-height:1;
+    opacity:.9;filter:grayscale(1) contrast(1.08);
+  }
+  .logo-chip[data-size="lg"]{font-size:1.22rem;font-weight:700;letter-spacing:.01em}
+  .logo-chip[data-size="sm"]{font-size:.92rem;letter-spacing:.08em;text-transform:uppercase}
+  .logo-chip[data-tone="muted"]{color:var(--muted);opacity:.95}
+  .logo-chip[data-tone="accent"]{color:#2f7a55}
+  .logo-chip[data-tone="blue"]{color:#223d8f}
+  .logo-chip[data-tone="red"]{color:#c75761}
+  .logo-chip[data-tone="black"]{color:#141414}
+  @keyframes logo-scroll{
+    from{transform:translateX(0)}
+    to{transform:translateX(-50%)}
+  }
+  .cat-code{position:absolute;top:36px;right:32px}
+  .cat-card h3{
+    font-stretch:112%;font-weight:700;text-transform:uppercase;
+    letter-spacing:.01em;font-size:1.15rem;color:var(--white);margin-bottom:10px;
+  }
+  html[lang="ko"] .cat-card h3{font-family:var(--font-kr);font-stretch:normal}
+  .cat-card p{color:var(--muted);font-size:.92rem;max-width:38ch}
+
+  /* ---------- PROCESS ---------- */
+  .process{border-top:1px solid var(--line)}
+  .steps{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    border-top:1px solid var(--line);
+  }
+  .step{
+    padding:32px 28px 8px 0;position:relative;
+  }
+  .step::before{
+    content:'';position:absolute;top:-1px;left:0;width:40px;height:1px;
+    background:var(--text);
+  }
+  .step-num{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;color:var(--dim)}
+  .step h3{font-size:1rem;font-weight:600;color:var(--white);margin:14px 0 8px}
+  .step p{color:var(--muted);font-size:.88rem}
+
+  /* ---------- WHY ---------- */
+  .why{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+  .why-item h3{font-size:1.05rem;font-weight:600;color:var(--white);margin:16px 0 10px}
+  .why-item p{color:var(--muted);font-size:.92rem}
+  .why-rule{width:40px;height:1px;background:var(--text)}
+
+  /* ---------- CONTACT ---------- */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px}
+  .contact-info p{color:var(--muted);max-width:40ch;margin:18px 0 32px}
+  .contact-channels{display:flex;flex-direction:column;gap:14px}
+  .contact-channels a{
+    color:var(--text);text-decoration:none;font-size:.95rem;
+    display:flex;align-items:baseline;gap:14px;
+    transition:color .3s ease;
+  }
+  .contact-channels a:hover{color:var(--white)}
+  .contact-channels .mono{min-width:64px}
+
+  form{display:flex;flex-direction:column;gap:18px}
+  label{display:flex;flex-direction:column;gap:8px}
+  input,select,textarea{
+    background:var(--surface);border:1px solid var(--line);border-radius:2px;
+    color:var(--text);font-family:inherit;font-size:.95rem;
+    padding:13px 14px;transition:border-color .3s ease;
+    appearance:none;-webkit-appearance:none;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--muted);outline:none}
+  textarea{resize:vertical;min-height:110px}
+  select{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;
+  }
+  form .btn{align-self:flex-start;cursor:pointer;margin-top:6px}
+  .form-note{font-size:.85rem;color:var(--dim)}
+  .form-success{color:var(--text);font-size:.95rem;display:none}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--line);padding:42px 0 48px}
+  .footer-inner{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+  .disclaimer{color:var(--dim);font-size:.78rem;max-width:62ch;line-height:1.7}
+
+  /* ---------- REVEAL ANIMATION ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease-out,transform .6s ease-out}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .reveal{opacity:1;transform:none;transition:none}
+    *{transition:none!important}
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:880px){
+    .nav-links a{display:none}
+    .cat-grid{grid-template-columns:1fr}
+    .cat-card{border-right:0!important;border-bottom:1px solid var(--line)!important}
+    .cat-card:last-child{border-bottom:0!important}
+    .logo-marquee{height:160px}
+    .steps{grid-template-columns:1fr;gap:8px}
+    .step{padding-right:0}
+    .why-grid{grid-template-columns:1fr;gap:36px}
+    .contact-grid{grid-template-columns:1fr;gap:48px}
+    section{padding:80px 0}
+    .btn-ghost{margin-left:0;margin-top:12px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="wordmark">KORUZ<span>·KR</span></a>
+    <div class="nav-links">
+      <a href="#categories" data-i18n="nav_cat"></a>
+      <a href="#process" data-i18n="nav_process"></a>
+      <a href="#contact" data-i18n="nav_contact"></a>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button id="lang-en" class="active" onclick="setLang('en')">EN</button>
+        <button id="lang-ko" onclick="setLang('ko')">KO</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="container hero-content">
+    <div class="mono" data-i18n="hero_eyebrow"></div>
+    <h1 class="display" data-i18n="hero_title"></h1>
+    <p class="hero-sub" data-i18n="hero_sub"></p>
+    <div>
+      <a href="#contact" class="btn" data-i18n="hero_cta"></a>
+      <a href="#categories" class="btn btn-ghost" data-i18n="hero_cta2"></a>
+    </div>
+    <div class="hero-meta mono">
+      <div data-i18n="meta_1"></div>
+      <div data-i18n="meta_2"></div>
+      <div data-i18n="meta_3"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ CATEGORIES ============ -->
+<section id="categories">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="mono" data-i18n="cat_eyebrow"></div>
+      <h2 class="display" data-i18n="cat_title"></h2>
+    </div>
+    <div class="cat-grid reveal">
+      <div class="cat-card">
+        <span class="cat-code mono">VHC</span>
+        <canvas data-shape="octahedron"></canvas>
+        <h3 data-i18n="cat1_name"></h3>
+        <p data-i18n="cat1_desc"></p>
+      </div>
+      <div class="cat-card">
+        <span class="cat-code mono">PRT</span>
+        <canvas data-shape="icosahedron"></canvas>
+        <h3 data-i18n="cat2_name"></h3>
+        <p data-i18n="cat2_desc"></p>
+      </div>
+      <div class="cat-card">
+        <span class="cat-code mono">CSM</span>
+        <div class="logo-marquee" aria-label="Cosmetics brands">
+          <div class="logo-track">
+            <div class="logo-set">
+              <span class="logo-chip">Anua</span>
+              <span class="logo-chip">celimax</span>
+              <span class="logo-chip">AXIS-Y</span>
+              <span class="logo-chip">3W CLINIC</span>
+              <span class="logo-chip">medicube</span>
+              <span class="logo-chip">MEDIPEEL+</span>
+              <span class="logo-chip" data-tone="red" data-size="lg">Luvum</span>
+              <span class="logo-chip">LAGOM</span>
+              <span class="logo-chip" data-tone="blue" data-size="lg">Dr.GRAFT</span>
+              <span class="logo-chip" data-size="lg">COSRX</span>
+              <span class="logo-chip" data-tone="accent" data-size="lg">Dr.G</span>
+              <span class="logo-chip" data-tone="blue" data-size="lg">WELLDERMA</span>
+              <span class="logo-chip">SKINDOM</span>
+              <span class="logo-chip" data-tone="accent">VT COSMETICS</span>
+              <span class="logo-chip">MERIKIT</span>
+              <span class="logo-chip" data-size="sm">SKIN1004</span>
+              <span class="logo-chip" data-tone="red">Centellian24</span>
+              <span class="logo-chip">Foellie</span>
+              <span class="logo-chip" data-size="lg">ROUND LAB</span>
+              <span class="logo-chip">BEAUTY OF JOSEON</span>
+              <span class="logo-chip">d'Alba</span>
+              <span class="logo-chip" data-tone="red">rom&nd</span>
+              <span class="logo-chip">CLIO PROFESSIONAL</span>
+              <span class="logo-chip">Dr. Althea</span>
+              <span class="logo-chip">Biodance</span>
+            </div>
+            <div class="logo-set" aria-hidden="true">
+              <span class="logo-chip">Anua</span>
+              <span class="logo-chip">celimax</span>
+              <span class="logo-chip">AXIS-Y</span>
+              <span class="logo-chip">3W CLINIC</span>
+              <span class="logo-chip">medicube</span>
+              <span class="logo-chip">MEDIPEEL+</span>
+              <span class="logo-chip" data-tone="red" data-size="lg">Luvum</span>
+              <span class="logo-chip">LAGOM</span>
+              <span class="logo-chip" data-tone="blue" data-size="lg">Dr.GRAFT</span>
+              <span class="logo-chip" data-size="lg">COSRX</span>
+              <span class="logo-chip" data-tone="accent" data-size="lg">Dr.G</span>
+              <span class="logo-chip" data-tone="blue" data-size="lg">WELLDERMA</span>
+              <span class="logo-chip">SKINDOM</span>
+              <span class="logo-chip" data-tone="accent">VT COSMETICS</span>
+              <span class="logo-chip">MERIKIT</span>
+              <span class="logo-chip" data-size="sm">SKIN1004</span>
+              <span class="logo-chip" data-tone="red">Centellian24</span>
+              <span class="logo-chip">Foellie</span>
+              <span class="logo-chip" data-size="lg">ROUND LAB</span>
+              <span class="logo-chip">BEAUTY OF JOSEON</span>
+              <span class="logo-chip">d'Alba</span>
+              <span class="logo-chip" data-tone="red">rom&nd</span>
+              <span class="logo-chip">CLIO PROFESSIONAL</span>
+              <span class="logo-chip">Dr. Althea</span>
+              <span class="logo-chip">Biodance</span>
+            </div>
+          </div>
+          <div class="logo-track reverse" aria-hidden="true">
+            <div class="logo-set">
+              <span class="logo-chip" data-tone="black">Anua</span>
+              <span class="logo-chip" data-tone="black">celimax</span>
+              <span class="logo-chip" data-tone="black">AXIS-Y</span>
+              <span class="logo-chip" data-tone="black">3W CLINIC</span>
+              <span class="logo-chip" data-tone="black">medicube</span>
+              <span class="logo-chip" data-tone="black">MEDIPEEL+</span>
+              <span class="logo-chip" data-tone="red" data-size="lg">Luvum</span>
+              <span class="logo-chip" data-tone="black">LAGOM</span>
+              <span class="logo-chip" data-tone="blue" data-size="lg">Dr.GRAFT</span>
+              <span class="logo-chip" data-tone="black" data-size="lg">COSRX</span>
+              <span class="logo-chip" data-tone="accent" data-size="lg">Dr.G</span>
+              <span class="logo-chip" data-tone="blue" data-size="lg">WELLDERMA</span>
+              <span class="logo-chip" data-tone="black">SKINDOM</span>
+              <span class="logo-chip" data-tone="accent">VT COSMETICS</span>
+              <span class="logo-chip" data-tone="black">MERIKIT</span>
+              <span class="logo-chip" data-tone="black" data-size="sm">SKIN1004</span>
+              <span class="logo-chip" data-tone="red">Centellian24</span>
+              <span class="logo-chip" data-tone="black">Foellie</span>
+              <span class="logo-chip" data-tone="black" data-size="lg">ROUND LAB</span>
+              <span class="logo-chip" data-tone="black">BEAUTY OF JOSEON</span>
+              <span class="logo-chip" data-tone="black">d'Alba</span>
+              <span class="logo-chip" data-tone="red">rom&nd</span>
+              <span class="logo-chip" data-tone="black">CLIO PROFESSIONAL</span>
+              <span class="logo-chip" data-tone="black">Dr. Althea</span>
+              <span class="logo-chip" data-tone="black">Biodance</span>
+            </div>
+            <div class="logo-set" aria-hidden="true">
+              <span class="logo-chip" data-tone="black">Anua</span>
+              <span class="logo-chip" data-tone="black">celimax</span>
+              <span class="logo-chip" data-tone="black">AXIS-Y</span>
+              <span class="logo-chip" data-tone="black">3W CLINIC</span>
+              <span class="logo-chip" data-tone="black">medicube</span>
+              <span class="logo-chip" data-tone="black">MEDIPEEL+</span>
+              <span class="logo-chip" data-tone="red" data-size="lg">Luvum</span>
+              <span class="logo-chip" data-tone="black">LAGOM</span>
+              <span class="logo-chip" data-tone="blue" data-size="lg">Dr.GRAFT</span>
+              <span class="logo-chip" data-tone="black" data-size="lg">COSRX</span>
+              <span class="logo-chip" data-tone="accent" data-size="lg">Dr.G</span>
+              <span class="logo-chip" data-tone="blue" data-size="lg">WELLDERMA</span>
+              <span class="logo-chip" data-tone="black">SKINDOM</span>
+              <span class="logo-chip" data-tone="accent">VT COSMETICS</span>
+              <span class="logo-chip" data-tone="black">MERIKIT</span>
+              <span class="logo-chip" data-tone="black" data-size="sm">SKIN1004</span>
+              <span class="logo-chip" data-tone="red">Centellian24</span>
+              <span class="logo-chip" data-tone="black">Foellie</span>
+              <span class="logo-chip" data-tone="black" data-size="lg">ROUND LAB</span>
+              <span class="logo-chip" data-tone="black">BEAUTY OF JOSEON</span>
+              <span class="logo-chip" data-tone="black">d'Alba</span>
+              <span class="logo-chip" data-tone="red">rom&nd</span>
+              <span class="logo-chip" data-tone="black">CLIO PROFESSIONAL</span>
+              <span class="logo-chip" data-tone="black">Dr. Althea</span>
+              <span class="logo-chip" data-tone="black">Biodance</span>
+            </div>
+          </div>
+        </div>
+        <h3 data-i18n="cat3_name"></h3>
+        <p data-i18n="cat3_desc"></p>
+      </div>
+      <div class="cat-card">
+        <span class="cat-code mono">LPT</span>
+        <canvas data-shape="cube"></canvas>
+        <h3 data-i18n="cat4_name"></h3>
+        <p data-i18n="cat4_desc"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section id="process" class="process">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="mono" data-i18n="proc_eyebrow"></div>
+      <h2 class="display" data-i18n="proc_title"></h2>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <span class="step-num">01</span>
+        <h3 data-i18n="step1_name"></h3>
+        <p data-i18n="step1_desc"></p>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <h3 data-i18n="step2_name"></h3>
+        <p data-i18n="step2_desc"></p>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <h3 data-i18n="step3_name"></h3>
+        <p data-i18n="step3_desc"></p>
+      </div>
+      <div class="step">
+        <span class="step-num">04</span>
+        <h3 data-i18n="step4_name"></h3>
+        <p data-i18n="step4_desc"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY ============ -->
+<section class="why">
+  <div class="container">
+    <div class="why-grid reveal">
+      <div class="why-item">
+        <div class="why-rule"></div>
+        <h3 data-i18n="why1_name"></h3>
+        <p data-i18n="why1_desc"></p>
+      </div>
+      <div class="why-item">
+        <div class="why-rule"></div>
+        <h3 data-i18n="why2_name"></h3>
+        <p data-i18n="why2_desc"></p>
+      </div>
+      <div class="why-item">
+        <div class="why-rule"></div>
+        <h3 data-i18n="why3_name"></h3>
+        <p data-i18n="why3_desc"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <div class="mono" data-i18n="ct_eyebrow"></div>
+        <h2 class="display" style="font-size:clamp(1.8rem,4vw,3rem);margin-top:14px" data-i18n="ct_title"></h2>
+        <p data-i18n="ct_sub"></p>
+        <div class="contact-channels">
+          <a href="https://t.me/your_handle" target="_blank" rel="noopener"><span class="mono">TG</span> @your_handle</a>
+          <a href="mailto:hello@example.com"><span class="mono">MAIL</span> hello@example.com</a>
+          <a href="#"><span class="mono">SEOUL</span> <span data-i18n="ct_loc"></span></a>
+        </div>
+      </div>
+      <form id="quote-form" class="reveal">
+        <label>
+          <span class="mono" data-i18n="f_name"></span>
+          <input type="text" name="name" required>
+        </label>
+        <label>
+          <span class="mono" data-i18n="f_contact"></span>
+          <input type="text" name="contact" required>
+        </label>
+        <label>
+          <span class="mono" data-i18n="f_cat"></span>
+          <select name="category">
+            <option data-i18n="cat1_name"></option>
+            <option data-i18n="cat2_name"></option>
+            <option data-i18n="cat3_name"></option>
+            <option data-i18n="cat4_name"></option>
+          </select>
+        </label>
+        <label>
+          <span class="mono" data-i18n="f_msg"></span>
+          <textarea name="message"></textarea>
+        </label>
+        <button type="submit" class="btn" data-i18n="f_send"></button>
+        <span class="form-note" data-i18n="f_note"></span>
+        <span class="form-success" id="form-success" data-i18n="f_ok"></span>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div>
+      <a href="#" class="wordmark">KORUZ<span>·KR</span></a>
+      <div class="mono" style="margin-top:10px">SEOUL — TASHKENT</div>
+    </div>
+    <p class="disclaimer" data-i18n="footer_disclaimer"></p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ================= I18N ================= */
+const I18N = {
+  en: {
+    nav_cat: "Categories",
+    nav_process: "Process",
+    nav_contact: "Contact",
+    hero_eyebrow: "Sourcing · Seoul → Tashkent",
+    hero_title: "Direct sourcing from South Korea",
+    hero_sub: "We find, verify, and ship goods from Korean sellers — vehicles, parts, cosmetics, and laptops. No dealer markups, no middleman chains.",
+    hero_cta: "Request a quote",
+    hero_cta2: "View categories",
+    meta_1: "EST. 2026",
+    meta_2: "4 categories",
+    meta_3: "Inspection before purchase",
+    cat_eyebrow: "What we source",
+    cat_title: "Four categories",
+    cat1_name: "Vehicles",
+    cat1_desc: "Used and new cars sourced from Korean marketplaces and auctions, inspected before purchase.",
+    cat2_name: "Auto parts",
+    cat2_desc: "OEM and aftermarket parts located by VIN or part number, from engines to body panels.",
+    cat3_name: "Cosmetics",
+    cat3_desc: "K-beauty products purchased in wholesale volumes directly from verified sellers.",
+    cat4_name: "Laptops",
+    cat4_desc: "Business and consumer laptops, graded and tested before shipment.",
+    proc_eyebrow: "How it works",
+    proc_title: "From request to delivery",
+    step1_name: "Request",
+    step1_desc: "Tell us what you need — a model, a part number, or just a budget and a goal.",
+    step2_name: "Sourcing & inspection",
+    step2_desc: "We locate options, check condition and history, and send you a report with photos.",
+    step3_name: "Purchase",
+    step3_desc: "You approve, we buy directly from the seller at the local price.",
+    step4_name: "Delivery",
+    step4_desc: "Packing, export paperwork, and shipping to Uzbekistan — handled end to end.",
+    why1_name: "Direct purchase",
+    why1_desc: "We buy from sellers at local Korean prices. No dealer margins built into your quote.",
+    why2_name: "Verified before payment",
+    why2_desc: "You see inspection reports and photos before committing a single sum.",
+    why3_name: "Korea ↔ Uzbekistan",
+    why3_desc: "We operate on both ends: sourcing in Seoul, delivery and paperwork in Tashkent.",
+    ct_eyebrow: "Contact",
+    ct_title: "Tell us what you need",
+    ct_sub: "Describe the product, send a link or a part number — we reply with options and a quote.",
+    ct_loc: "Seongdong-gu, Seoul",
+    f_name: "Name",
+    f_contact: "Telegram or phone",
+    f_cat: "Category",
+    f_msg: "What are you looking for?",
+    f_send: "Send request",
+    f_note: "We usually reply within 24 hours.",
+    f_ok: "Request received — we'll get back to you shortly.",
+    footer_disclaimer: "KORUZ is an independent sourcing service. We are not a dealer, distributor, or authorized representative of any manufacturer or brand. All products are purchased directly from their respective sellers."
+  },
+  ko: {
+    nav_cat: "카테고리",
+    nav_process: "진행 절차",
+    nav_contact: "문의",
+    hero_eyebrow: "소싱 · 서울 → 타슈켄트",
+    hero_title: "대한민국 직접 소싱",
+    hero_sub: "차량, 부품, 화장품, 노트북 — 한국 판매자로부터 상품을 찾고, 검증하고, 배송합니다. 딜러 마진도, 불필요한 중간 단계도 없습니다.",
+    hero_cta: "견적 요청",
+    hero_cta2: "카테고리 보기",
+    meta_1: "EST. 2026",
+    meta_2: "4개 카테고리",
+    meta_3: "구매 전 검수",
+    cat_eyebrow: "취급 품목",
+    cat_title: "네 가지 카테고리",
+    cat1_name: "차량",
+    cat1_desc: "한국 중고차 플랫폼과 경매에서 차량을 찾아 구매 전 상태를 점검합니다.",
+    cat2_name: "자동차 부품",
+    cat2_desc: "VIN 또는 부품 번호로 OEM·애프터마켓 부품을 찾아드립니다.",
+    cat3_name: "화장품",
+    cat3_desc: "검증된 판매자로부터 K-뷰티 제품을 도매 물량으로 구매합니다.",
+    cat4_name: "노트북",
+    cat4_desc: "비즈니스·일반 노트북을 등급 분류 및 테스트 후 발송합니다.",
+    proc_eyebrow: "진행 절차",
+    proc_title: "요청부터 배송까지",
+    step1_name: "요청",
+    step1_desc: "필요한 것을 알려주세요 — 모델명, 부품 번호, 또는 예산과 목적만으로도 충분합니다.",
+    step2_name: "소싱 및 검수",
+    step2_desc: "옵션을 찾아 상태와 이력을 확인하고, 사진과 함께 리포트를 보내드립니다.",
+    step3_name: "구매",
+    step3_desc: "승인하시면 현지 가격 그대로 판매자에게서 직접 구매합니다.",
+    step4_name: "배송",
+    step4_desc: "포장, 수출 서류, 우즈베키스탄까지의 배송 — 전 과정을 처리합니다.",
+    why1_name: "직접 구매",
+    why1_desc: "한국 현지 가격으로 판매자에게서 직접 구매합니다. 딜러 마진이 없습니다.",
+    why2_name: "결제 전 검증",
+    why2_desc: "결제 전에 검수 리포트와 사진을 먼저 확인하실 수 있습니다.",
+    why3_name: "한국 ↔ 우즈베키스탄",
+    why3_desc: "서울에서 소싱, 타슈켄트에서 배송과 서류 처리 — 양쪽에서 운영합니다.",
+    ct_eyebrow: "문의",
+    ct_title: "필요한 것을 알려주세요",
+    ct_sub: "제품 설명, 링크 또는 부품 번호를 보내주시면 옵션과 견적으로 답변드립니다.",
+    ct_loc: "서울 성동구",
+    f_name: "이름",
+    f_contact: "텔레그램 또는 전화번호",
+    f_cat: "카테고리",
+    f_msg: "어떤 상품을 찾으시나요?",
+    f_send: "요청 보내기",
+    f_note: "보통 24시간 이내에 답변드립니다.",
+    f_ok: "요청이 접수되었습니다 — 곧 연락드리겠습니다.",
+    footer_disclaimer: "KORUZ는 독립 소싱 서비스입니다. 당사는 어떤 제조사나 브랜드의 딜러, 유통사 또는 공식 대리점이 아닙니다. 모든 제품은 해당 판매자로부터 직접 구매합니다."
+  }
+};
+
+function setLang(lang){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(I18N[lang][key] !== undefined) el.textContent = I18N[lang][key];
+  });
+  document.getElementById('lang-en').classList.toggle('active', lang==='en');
+  document.getElementById('lang-ko').classList.toggle('active', lang==='ko');
+  document.title = lang==='ko' ? 'KORUZ — 대한민국 직접 소싱' : 'KORUZ — Direct Sourcing from South Korea';
+  try{ localStorage.setItem('koruz-lang', lang); }catch(e){}
+}
+let savedLang = 'en';
+try{ savedLang = localStorage.getItem('koruz-lang') || 'en'; }catch(e){}
+setLang(savedLang);
+
+/* ================= SCROLL REVEAL ================= */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ================= FORM (placeholder) ================= */
+document.getElementById('quote-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  document.getElementById('form-success').style.display = 'block';
+  e.target.querySelector('button').disabled = true;
+});
+
+/* ================= THREE.JS ================= */
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DPR = Math.min(window.devicePixelRatio || 1, 1.75);
+let pageVisible = true;
+document.addEventListener('visibilitychange', ()=>{ pageVisible = !document.hidden; });
+
+/* ---- Hero: drifting wireframe octahedra ---- */
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(DPR);
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x0B0B0C, 6, 22);
+  const camera = new THREE.PerspectiveCamera(55, 1, .1, 100);
+  camera.position.z = 10;
+
+  const matDim    = new THREE.MeshBasicMaterial({color:0x3A3A3E, wireframe:true});
+  const matBright = new THREE.MeshBasicMaterial({color:0x8E8E93, wireframe:true});
+  const shapes = [];
+  const geo = new THREE.OctahedronGeometry(1, 0);
+
+  for(let i=0;i<14;i++){
+    const mesh = new THREE.Mesh(geo, i%4===0 ? matBright : matDim);
+    const s = .45 + Math.random()*1.5;
+    mesh.scale.setScalar(s);
+    mesh.position.set(
+      (Math.random()-.5)*16,
+      (Math.random()-.5)*9,
+      (Math.random()-.5)*10 - 2
+    );
+    mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+    mesh.userData = {
+      rx:(Math.random()-.5)*.004,
+      ry:(Math.random()-.5)*.005,
+      fy:Math.random()*Math.PI*2,
+      fs:.2+Math.random()*.4
+    };
+    scene.add(mesh);
+    shapes.push(mesh);
+  }
+
+  let mouseX=0, mouseY=0;
+  window.addEventListener('pointermove', e=>{
+    mouseX = (e.clientX/window.innerWidth - .5);
+    mouseY = (e.clientY/window.innerHeight - .5);
+  }, {passive:true});
+
+  function resize(){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const clock = new THREE.Clock();
+  function frame(){
+    requestAnimationFrame(frame);
+    if(!pageVisible) return;
+    const t = clock.getElapsedTime();
+    shapes.forEach(m=>{
+      m.rotation.x += m.userData.rx;
+      m.rotation.y += m.userData.ry;
+      m.position.y += Math.sin(t*m.userData.fs + m.userData.fy)*.0015;
+    });
+    camera.position.x += (mouseX*1.4 - camera.position.x)*.04;
+    camera.position.y += (-mouseY*.9 - camera.position.y)*.04;
+    camera.lookAt(0,0,0);
+    renderer.render(scene, camera);
+  }
+  if(reducedMotion){ resize(); renderer.render(scene, camera); }
+  else frame();
+})();
+
+/* ---- Category cards: one primitive each ---- */
+(function(){
+  const GEOS = {
+    octahedron:  ()=> new THREE.OctahedronGeometry(1.15, 0),
+    icosahedron: ()=> new THREE.IcosahedronGeometry(1.1, 0),
+    tetrahedron: ()=> new THREE.TetrahedronGeometry(1.25, 0),
+    cube:        ()=> new THREE.BoxGeometry(1.6, 1.6, 1.6)
+  };
+  document.querySelectorAll('.cat-card canvas').forEach(canvas=>{
+    const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+    renderer.setPixelRatio(DPR);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, .1, 50);
+    camera.position.z = 4;
+
+    const geo = GEOS[canvas.dataset.shape]();
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color:0x6E6E73, wireframe:true}));
+    scene.add(mesh);
+
+    const card = canvas.closest('.cat-card');
+    let hover = false;
+    card.addEventListener('pointerenter', ()=>hover=true);
+    card.addEventListener('pointerleave', ()=>hover=false);
+
+    function resize(){
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w/h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let speed = .004;
+    function frame(){
+      requestAnimationFrame(frame);
+      if(!pageVisible) return;
+      const target = hover ? .016 : .004;
+      speed += (target - speed)*.06;
+      mesh.rotation.y += speed;
+      mesh.rotation.x += speed*.45;
+      renderer.render(scene, camera);
+    }
+    if(reducedMotion){ mesh.rotation.set(.5,.7,0); resize(); renderer.render(scene, camera); }
+    else frame();
+  });
+})();
+</script>
+</body>
+</html>
