@@ -1,7 +1,7 @@
 using KoruzApi.Data;
 using KoruzApi.Database;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +50,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+// Uploaded images live next to SQLite data (survive republish)
+var dataDirectory = dbSettings.DataDirectory;
+if (string.IsNullOrWhiteSpace(dataDirectory))
+{
+    dataDirectory = Path.Combine(app.Environment.ContentRootPath, "data");
+}
+var uploadsDirectory = Path.Combine(dataDirectory, "uploads");
+Directory.CreateDirectory(uploadsDirectory);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsDirectory),
+    RequestPath = "/uploads"
+});
+
 app.UseHttpsRedirection();
 app.UseCors("AdminUiCors");
 app.UseAuthorization();
@@ -151,6 +166,12 @@ static void SeedDefaultContent(AppDbContext db)
             email = "hello@koruzb.com",
             telegram = "@koruzb",
             location = "Seoul, South Korea"
+        },
+        images = new Dictionary<string, string>
+        {
+            ["Cosmetics"] = "",
+            ["Vehicle"] = "",
+            ["Laptop"] = ""
         }
     };
 
@@ -178,4 +199,3 @@ static void AddOrUpdateDefaultSite(AppDbContext db, string websiteCode, object p
 
     db.SaveChanges();
 }
-
