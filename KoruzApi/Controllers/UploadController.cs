@@ -1,3 +1,4 @@
+using KoruzApi.Security;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KoruzApi.Controllers;
@@ -39,6 +40,11 @@ public class UploadController : ControllerBase
     [RequestSizeLimit(15_000_000)]
     public async Task<ActionResult<object>> Upload(IFormFile file)
     {
+        if (!AdminToken.IsValid(_configuration, AdminToken.Extract(Request)))
+        {
+            return Unauthorized(new { message = "Admin token required." });
+        }
+
         if (file is null || file.Length == 0)
         {
             return BadRequest(new { message = "No file uploaded." });
