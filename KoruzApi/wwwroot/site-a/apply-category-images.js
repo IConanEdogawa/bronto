@@ -18,14 +18,16 @@
     style.id = 'koruz-cat-image-carousel-style';
     style.textContent = `
       .koruz-img-marquee {
+        position: relative;
         width: 100%;
-        height: 120px;
-        margin: 0 0 18px;
+        height: 150px;
+        margin: 0 0 22px;
         overflow: hidden;
         border: 1px solid rgba(255,255,255,.08);
+        border-radius: 2px;
         background:
-          linear-gradient(90deg, rgba(11,11,12,.98), rgba(11,11,12,0) 10%, rgba(11,11,12,0) 90%, rgba(11,11,12,.98)),
-          rgba(255,255,255,.02);
+          linear-gradient(90deg, rgba(11,11,12,.98) 0%, rgba(11,11,12,0) 12%, rgba(11,11,12,0) 88%, rgba(11,11,12,.98) 100%),
+          linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
         display: flex;
         align-items: center;
       }
@@ -33,30 +35,54 @@
       .koruz-img-track {
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 28px;
         width: max-content;
-        animation: koruz-img-scroll 36s linear infinite;
+        animation: koruz-img-scroll 42s linear infinite;
         will-change: transform;
-        padding: 0 12px;
+        padding: 0 16px;
       }
       .koruz-img-marquee:hover .koruz-img-track {
         animation-play-state: paused;
       }
-      .koruz-img-track img {
-        height: 72px;
-        width: auto;
-        max-width: 160px;
-        object-fit: contain;
-        filter: grayscale(0.15) contrast(1.05);
-        opacity: 0.95;
+      .koruz-img-set {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+      .koruz-img-slot {
         flex: 0 0 auto;
-        background: rgba(255,255,255,.04);
-        border-radius: 4px;
-        padding: 6px;
+        height: 96px;
+        min-width: 120px;
+        max-width: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border: 1px solid rgba(255,255,255,.06);
+        background: rgba(255,255,255,.03);
+      }
+      .koruz-img-slot img {
+        max-height: 72px;
+        max-width: 150px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        filter: grayscale(1) brightness(1.15) contrast(1.05);
+        opacity: 0.9;
+        transition: filter .35s ease, opacity .35s ease, transform .35s ease;
+      }
+      .koruz-img-marquee:hover .koruz-img-slot img {
+        filter: grayscale(0.2) brightness(1.05) contrast(1.05);
+        opacity: 1;
       }
       @keyframes koruz-img-scroll {
         from { transform: translateX(0); }
         to { transform: translateX(-50%); }
+      }
+      @media (max-width: 880px) {
+        .koruz-img-marquee { height: 120px; }
+        .koruz-img-slot { height: 78px; min-width: 96px; max-width: 140px; }
+        .koruz-img-slot img { max-height: 56px; max-width: 120px; }
       }
       @media (prefers-reduced-motion: reduce) {
         .koruz-img-track { animation: none; }
@@ -96,20 +122,20 @@
 
     const makeSet = () => {
       const set = document.createElement('div');
-      set.style.display = 'flex';
-      set.style.alignItems = 'center';
-      set.style.gap = '18px';
+      set.className = 'koruz-img-set';
       urls.forEach(url => {
+        const slot = document.createElement('div');
+        slot.className = 'koruz-img-slot';
         const img = document.createElement('img');
         img.src = url;
         img.alt = 'logo';
         img.loading = 'lazy';
-        set.appendChild(img);
+        slot.appendChild(img);
+        set.appendChild(slot);
       });
       return set;
     };
 
-    // duplicate for seamless loop
     track.appendChild(makeSet());
     track.appendChild(makeSet());
     wrap.appendChild(track);
@@ -126,18 +152,12 @@
       if (!card) return;
 
       const urls = normalizeList(source[code]);
-      let host = card.querySelector('.koruz-img-marquee');
-      if (host) host.remove();
+      card.querySelectorAll('.koruz-img-marquee').forEach(el => el.remove());
 
-      host = buildMarquee(urls);
-
-      // Prefer placing after canvas / existing visual, before h3
+      const host = buildMarquee(urls);
       const h3 = card.querySelector('h3');
-      if (h3) {
-        card.insertBefore(host, h3);
-      } else {
-        card.appendChild(host);
-      }
+      if (h3) card.insertBefore(host, h3);
+      else card.appendChild(host);
     });
   }
 
@@ -149,9 +169,7 @@
         localStorage.setItem('koruz_api_base', base);
         const data = await response.json();
         const content = data?.siteContent || {};
-        // dedicated key; fallback to images.* if arrays stored there
-        const categoryImages = content.categoryImages || content.images || {};
-        applyCategoryImages(categoryImages);
+        applyCategoryImages(content.categoryImages || {});
         return;
       } catch (e) {}
     }
