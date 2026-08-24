@@ -16,6 +16,18 @@
     return text ? JSON.parse(text) : null;
   }
 
+  function polishImage(img) {
+    img.style.display = 'block';
+    img.style.width = '100%';
+    img.style.maxWidth = '100%';
+    img.style.height = 'auto';
+    img.style.maxHeight = '420px';
+    img.style.objectFit = 'cover';
+    img.style.objectPosition = 'center center';
+    img.style.borderRadius = '12px';
+    img.style.background = '#111';
+  }
+
   function applyImages(images) {
     if (!images || typeof images !== 'object') return;
     Object.keys(images).forEach(key => {
@@ -24,19 +36,30 @@
       document.querySelectorAll('img').forEach(img => {
         if ((img.getAttribute('alt') || '') === key) {
           img.src = url;
+          polishImage(img);
         }
+      });
+    });
+
+    // Also polish the three default photos even if not overridden
+    ['Cosmetics', 'Vehicle', 'Laptop'].forEach(key => {
+      document.querySelectorAll('img').forEach(img => {
+        if ((img.getAttribute('alt') || '') === key) polishImage(img);
       });
     });
   }
 
   async function loadImages() {
+    // Polish defaults immediately
+    applyImages({});
+
     for (const base of apiCandidates()) {
       try {
         const response = await fetch(`${base}/api/sitecontent/${SITE_CODE}`);
         if (!response.ok) continue;
         localStorage.setItem('koruz_api_base', base);
         const data = await readJson(response);
-        applyImages(data?.siteContent?.images);
+        applyImages(data?.siteContent?.images || {});
         return;
       } catch (e) {}
     }
