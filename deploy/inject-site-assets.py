@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Idempotent inject of contact JS, site-b CSS, and site-a category carousels."""
+"""Idempotent inject of site helper assets."""
 from pathlib import Path
 
 ROOTS = [
@@ -9,6 +9,7 @@ ROOTS = [
 
 CONTACT_TAG = '<script src="/js/apply-contact.js"></script>'
 SITE_A_CAT_JS = '<script src="apply-category-images.js"></script>'
+SITE_A_LOGO_FIX = '<script src="fix-logo-marquee.js"></script>'
 SITE_B_CSS = '<link rel="stylesheet" href="site-b-layout-fix.css">'
 SITE_B_JS = '<script src="apply-images.js"></script>'
 
@@ -46,6 +47,7 @@ def inject_in_head(path: Path, snippet: str, needle: str) -> None:
 for root in ROOTS:
     inject_before_body_end(root / "site-a" / "index.html", CONTACT_TAG, "apply-contact.js")
     inject_before_body_end(root / "site-a" / "index.html", SITE_A_CAT_JS, "apply-category-images.js")
+    inject_before_body_end(root / "site-a" / "index.html", SITE_A_LOGO_FIX, "fix-logo-marquee.js")
     inject_before_body_end(root / "site-b" / "index.html", CONTACT_TAG, "apply-contact.js")
     inject_before_body_end(root / "site-b" / "index.html", SITE_B_JS, "apply-images.js")
     inject_in_head(root / "site-b" / "index.html", SITE_B_CSS, "site-b-layout-fix.css")
