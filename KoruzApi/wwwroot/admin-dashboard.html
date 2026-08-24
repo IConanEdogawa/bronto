@@ -3,126 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KORUZ Admin Dashboard</title>
-  <style>
-    :root {
-      --bg: #e6edf1;
-      --panel: #ffffff;
-      --panel-soft: #edf3f5;
-      --line: rgba(19,52,88,0.1);
-      --text: #133458;
-      --muted: #5a7184;
-      --accent: #325E6A;
-      --accent-strong: #0D47A1;
-      --shadow: 0 16px 40px rgba(19,52,88,0.08);
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); }
-    body { padding: 32px; }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 20px; padding: 20px 26px; border-radius: 20px; background: rgba(255,255,255,0.65); border: 1px solid var(--line); box-shadow: var(--shadow);
-      margin-bottom: 28px;
-    }
-    .brand { font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.82rem; }
-    .user-box { display: flex; align-items: center; gap: 12px; }
-    .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f0e5d3, #d7b777); display: grid; place-items: center; font-weight: 800; }
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
-    .card {
-      background: var(--panel); border: 1px solid var(--line); border-radius: 24px; padding: 22px;
-      box-shadow: var(--shadow);
-    }
-    .card h3 { margin: 0 0 10px; font-size: 1.08rem; }
-    .card p { margin: 0; color: var(--muted); line-height: 1.7; }
-    .site-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-    .site-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel-soft);
-    }
-    .site-item .label { font-weight: 700; }
-    .site-item .tag { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
-    button {
-      border: none; border-radius: 12px; background: linear-gradient(135deg, #f0ddd0, #d4bc8d 60%, #c7a96d);
-      color: #1a1d21; font-weight: 700; padding: 10px 14px; cursor: pointer;
-    }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-    .ghost { background: #fff; border: 1px solid var(--line); }
-    .logout { background: #1d2127; color: #fff; }
-  </style>
+  <title>BM Holdings Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div class="brand">KORUZ admin</div>
-      <div class="user-box">
-        <div class="avatar" id="avatar">A</div>
-        <div>
-          <div id="usernameLabel">Admin</div>
-        </div>
-        <button class="logout" id="logoutBtn">Logout</button>
+<body class="min-h-screen bg-slate-100 text-slate-900">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 rounded-3xl bg-white border border-slate-200 shadow-sm px-6 py-5">
+      <div>
+        <div class="text-xs font-semibold tracking-[0.2em] uppercase text-slate-400">BM Holdings</div>
+        <h1 class="text-xl font-bold mt-1">Admin dashboard</h1>
       </div>
-    </div>
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-sky-400 to-slate-800 text-white flex items-center justify-center font-bold" id="avatar">A</div>
+        <div class="text-sm">
+          <div class="font-semibold" id="usernameLabel">Admin</div>
+          <div class="text-slate-500">Signed in</div>
+        </div>
+        <button id="logoutBtn" class="ml-2 rounded-xl bg-slate-900 text-white text-sm font-semibold px-4 py-2.5 hover:bg-slate-800 transition">Logout</button>
+      </div>
+    </header>
 
-    <div class="dashboard-grid">
-      <div class="card">
-        <h3>Website A</h3>
-        <p>Update hero section, company details, categories and contact data for the main site.</p>
-        <div class="site-list">
-          <div class="site-item">
-            <div>
-              <div class="label">Website A</div>
-              <div class="tag">Published version</div>
-            </div>
-            <div class="actions">
-              <button class="ghost" onclick="window.location.href='site-a/index.html'">View</button>
-              <button onclick="window.location.href='admin-site.html?site=A'">Edit</button>
-            </div>
-          </div>
+    <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
+      <article class="rounded-3xl bg-white border border-slate-200 shadow-sm p-6 flex flex-col">
+        <div class="text-xs font-semibold tracking-wider uppercase text-sky-600 mb-2">Primary domain</div>
+        <h2 class="text-lg font-bold mb-2">Website A</h2>
+        <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-1">Hero, categories, contacts, and logo image carousels for bmholdings.llc.</p>
+        <div class="flex gap-2">
+          <a href="site-a/index.html" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition">View</a>
+          <a href="admin-site.html?site=A" class="rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-800 transition">Edit</a>
         </div>
-      </div>
+      </article>
 
-      <div class="card">
-        <h3>Website B</h3>
-        <p>Change the second brand concept, static content and contact information independently.</p>
-        <div class="site-list">
-          <div class="site-item">
-            <div>
-              <div class="label">Website B</div>
-              <div class="tag">Secondary version</div>
-            </div>
-            <div class="actions">
-              <button class="ghost" onclick="window.location.href='site-b/index.html'">View</button>
-              <button onclick="window.location.href='admin-site.html?site=B'">Edit</button>
-            </div>
-          </div>
+      <article class="rounded-3xl bg-white border border-slate-200 shadow-sm p-6 flex flex-col">
+        <div class="text-xs font-semibold tracking-wider uppercase text-amber-600 mb-2">Secondary brand</div>
+        <h2 class="text-lg font-bold mb-2">Website B</h2>
+        <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-1">Independent content, photos and contacts. Ready for a second domain later.</p>
+        <div class="flex gap-2">
+          <a href="site-b/index.html" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition">View</a>
+          <a href="admin-site.html?site=B" class="rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-800 transition">Edit</a>
         </div>
-      </div>
+      </article>
 
-      <div class="card">
-        <h3>Quick status</h3>
-        <p>System is connected to the SQLite database and both site configurations can be modified independently.</p>
-        <div class="site-list">
-          <div class="site-item">
-            <div>
-              <div class="label">DB status</div>
-              <div class="tag">Ready</div>
-            </div>
-            <button>Live</button>
-          </div>
+      <article class="rounded-3xl bg-white border border-slate-200 shadow-sm p-6 flex flex-col">
+        <div class="text-xs font-semibold tracking-wider uppercase text-emerald-600 mb-2">Status</div>
+        <h2 class="text-lg font-bold mb-2">System</h2>
+        <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-1">SQLite database connected. Uploads and content edits are stored on the server.</p>
+        <div class="inline-flex items-center gap-2 rounded-full bg-emerald-50 text-emerald-700 px-3 py-1.5 text-sm font-semibold w-fit">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Live
         </div>
-      </div>
+      </article>
     </div>
   </div>
 
   <script>
     const token = localStorage.getItem('koruz_admin_token');
     const user = JSON.parse(localStorage.getItem('koruz_admin_user') || '{}');
-
-    if (!token) {
-      window.location.href = 'admin-login.html';
-    }
+    if (!token) window.location.href = 'admin-login.html';
 
     document.getElementById('usernameLabel').textContent = user.username || 'Admin';
     document.getElementById('avatar').textContent = (user.username || 'A').charAt(0).toUpperCase();
