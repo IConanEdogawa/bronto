@@ -51,6 +51,42 @@
     }
     .group-title { margin: 22px 0 8px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
     .status { margin-top: 14px; color: var(--muted); }
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .image-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 10px 24px rgba(17, 21, 28, 0.04);
+    }
+    .image-card h4 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+    }
+    .image-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #eee;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .image-card .meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      word-break: break-all;
+    }
+    .image-card input[type="file"] {
+      width: 100%;
+      font-size: 0.85rem;
+    }
     @media (max-width: 820px) {
       body { padding: 14px; }
       .topbar { align-items: flex-start; flex-direction: column; }
@@ -73,7 +109,11 @@
       </div>
     </div>
 
-    <div class="summary" id="summary">Loading editable text...</div>
+    <div class="summary" id="summary">Loading editable content...</div>
+
+    <div class="group-title" id="imagesTitle" style="display:none;">Images</div>
+    <div class="image-grid" id="imageGrid"></div>
+
     <div class="editor-grid" id="editorGrid"></div>
     <div id="statusMessage" class="status"></div>
   </div>
@@ -84,6 +124,9 @@
     const queryApiBase = params.get('apiBase');
     const pagePath = siteCode === 'B' ? 'site-b/index.html' : 'site-a/index.html';
     const siteName = siteCode === 'B' ? 'Website B' : 'Website A';
+    const defaultImageKeys = siteCode === 'B'
+      ? ['Cosmetics', 'Vehicle', 'Laptop']
+      : [];
 
     if (queryApiBase) {
       localStorage.setItem('koruz_api_base', queryApiBase);
@@ -95,6 +138,8 @@
     }
 
     document.getElementById('siteLabel').textContent = `${siteName} (${siteCode})`;
+
+    let currentImages = {};
 
     function getApiCandidates() {
       const storedApiBase = localStorage.getItem('koruz_api_base') || '';
@@ -251,11 +296,72 @@
       return Object.keys(merged).length;
     }
 
+    function renderImageEditor(images) {
+      const grid = document.getElementById('imageGrid');
+      const title = document.getElementById('imagesTitle');
+      grid.innerHTML = '';
+
+      const keys = [...new Set([...defaultImageKeys, ...Object.keys(images || {})])];
+      if (!keys.length) {
+        title.style.display = 'none';
+        return 0;
+      }
+
+      title.style.display = 'block';
+      currentImages = { ...(images || {}) };
+
+      keys.forEach(key => {
+        if (!(key in currentImages)) currentImages[key] = '';
+        const url = currentImages[key] || '';
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        card.dataset.imageKey = key;
+        card.innerHTML = `
+          <h4></h4>
+          <img alt="" />
+          <div class="meta"></div>
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+        `;
+        card.querySelector('h4').textContent = key;
+        const img = card.querySelector('img');
+        const meta = card.querySelector('.meta');
+        img.src = url || 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="160"><rect width="100%" height="100%" fill="#e8e8e8"/><text x="50%" y="50%" text-anchor="middle" fill="#888" font-family="sans-serif" font-size="14">No image</text></svg>');
+        meta.textContent = url || 'Using default image from HTML';
+
+        card.querySelector('input[type="file"]').addEventListener('change', async (event) => {
+          const file = event.target.files?.[0];
+          if (!file) return;
+
+          document.getElementById('statusMessage').textContent = `Uploading ${key}...`;
+          try {
+            const body = new FormData();
+            body.append('file', file);
+            const response = await requestApi('/api/upload', { method: 'POST', body });
+            const result = await readJsonSafe(response);
+            if (!response.ok) {
+              throw new Error(result?.message || `Upload failed (HTTP ${response.status})`);
+            }
+            currentImages[key] = result.url;
+            img.src = result.url;
+            meta.textContent = result.url;
+            document.getElementById('statusMessage').textContent = `${key} uploaded. Click Save changes to publish.`;
+          } catch (error) {
+            document.getElementById('statusMessage').textContent = error.message || 'Upload failed.';
+          }
+        });
+
+        grid.appendChild(card);
+      });
+
+      return keys.length;
+    }
+
     function collectTranslations() {
       const translations = { en: {}, ko: {} };
 
       document.querySelectorAll('.text-row').forEach(row => {
         const key = row.dataset.key;
+        if (!key) return;
         row.querySelectorAll('textarea[data-lang]').forEach(input => {
           translations[input.dataset.lang][key] = input.value;
         });
@@ -278,7 +384,8 @@
       const payload = {
         siteName,
         translations: collectTranslations(),
-        staticText: collectStaticText()
+        staticText: collectStaticText(),
+        images: currentImages
       };
 
       const response = await requestApi(`/api/sitecontent/${siteCode}`, {
@@ -306,13 +413,14 @@
 
     Promise.all([loadOriginalTranslations(), loadOriginalStaticText(), loadSavedContent()])
       .then(([originalTranslations, originalStaticText, savedContent]) => {
+        const imageCount = renderImageEditor(savedContent.images || {});
         const translationCount = renderEditor(mergeTranslations(originalTranslations, savedContent.translations || {}));
         const staticCount = renderStaticEditor(originalStaticText, savedContent.staticText || {});
         document.getElementById('summary').textContent =
-          `${translationCount} translated keys and ${staticCount} static text nodes loaded from ${pagePath}.`;
+          `${imageCount} images, ${translationCount} translated keys and ${staticCount} static text nodes loaded from ${pagePath}.`;
       })
       .catch(error => {
-        document.getElementById('summary').textContent = error.message || 'Failed to load editable text.';
+        document.getElementById('summary').textContent = error.message || 'Failed to load editable content.';
       });
   </script>
 </body>
