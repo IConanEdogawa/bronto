@@ -1,50 +1,84 @@
-/* Prevent text from flowing over category / intro images on Site B */
-.intro-visual,
-.category-card,
-.card,
-.feature-card,
-.visual-card {
-  overflow: hidden;
-  min-width: 0;
-}
+/* Site B — keep text from overlapping images + better image presentation */
 
-.intro-visual img,
-.category-card img,
-.card img,
 img[alt="Cosmetics"],
 img[alt="Vehicle"],
-img[alt="Laptop"] {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  object-fit: cover;
+img[alt="Laptop"],
+.intro-visual img,
+.category img,
+.card img,
+.feature img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 420px;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border-radius: 12px;
+  background: #111;
 }
 
-/* Text next to / under images should wrap, not overflow */
-.intro-visual + *,
-.category-card p,
-.category-card h3,
-.card p,
-.card h3 {
+.intro-visual,
+.category,
+.card,
+.feature,
+.visual-card,
+.grid > * {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Text near images */
+p, h1, h2, h3, h4, li {
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-/* Soft clamp for long descriptions near images */
-.category-card p,
-.card p {
+/* Common content blocks next to visuals */
+.intro-visual + *,
+.category p,
+.card p,
+.feature p {
+  max-width: 100%;
+}
+
+/* Soft clamp long paragraphs so they don't flood the media */
+.category p,
+.card p,
+.feature p,
+.intro p {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 6;
-  line-clamp: 6;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
   overflow: hidden;
 }
 
-@media (max-width: 880px) {
+/* If layout is side-by-side, stack on smaller screens */
+@media (max-width: 900px) {
   .intro-visual,
-  .category-card,
-  .card {
-    max-width: 100%;
+  .category,
+  .card,
+  .feature {
+    display: block;
+    width: 100%;
   }
+
+  img[alt="Cosmetics"],
+  img[alt="Vehicle"],
+  img[alt="Laptop"] {
+    max-height: 280px;
+    margin-bottom: 14px;
+  }
+}
+
+/* Avoid stretched / squashed media */
+picture, figure {
+  max-width: 100%;
+}
+
+picture img, figure img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }
