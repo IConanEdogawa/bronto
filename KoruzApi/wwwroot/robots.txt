@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /site-a/
+Disallow: /site-b/
+Disallow: /admin-login.html
+Disallow: /admin-dashboard.html
+Disallow: /admin-site.html
+Disallow: /api/
+
+Sitemap: https://bmholdings.llc/sitemap.xml
