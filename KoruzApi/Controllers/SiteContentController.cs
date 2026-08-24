@@ -1,5 +1,7 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using KoruzApi.Data;
+using KoruzApi.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +12,12 @@ namespace KoruzApi.Controllers;
 public class SiteContentController : ControllerBase
 {
     private readonly AppDbContext _dbContext;
+    private readonly IConfiguration _configuration;
 
-    public SiteContentController(AppDbContext dbContext)
+    public SiteContentController(AppDbContext dbContext, IConfiguration configuration)
     {
         _dbContext = dbContext;
+        _configuration = configuration;
     }
 
     [HttpGet]
@@ -29,7 +33,7 @@ public class SiteContentController : ControllerBase
 
         return Ok(new
         {
-            updatedAtUtc = entries.Max(x => x.UpdatedAtUtc),
+            updatedAtUtc = entries.Count == 0 ? DateTime.UtcNow : entries.Max(x => x.UpdatedAtUtc),
             sites = result
         });
     }
@@ -66,27 +70,35 @@ public class SiteContentController : ControllerBase
     [HttpPut("{websiteCode}")]
     public async Task<ActionResult<object>> Put(string websiteCode, [FromBody] JsonElement payload)
     {
-        var normalized = NormalizeWebsiteCode(websiteCode);
-        var rawJson = payload.GetRawText();
+        if (!AdminToken.IsValid(_configuration, AdminToken.Extract(Request)))
+        {
+            return Unauthorized(new { message = "Admin token required." });
+        }
 
+        var normalized = NormalizeWebsiteCode(websiteCode);
         var entry = await _dbContext.SiteContent
             .FirstOrDefaultAsync(x => x.WebsiteCode == normalized);
 
         var now = DateTime.UtcNow;
+        var incoming = JsonNode.Parse(payload.GetRawText()) as JsonObject ?? new JsonObject();
 
+        JsonObject merged;
         if (entry is null)
         {
+            merged = incoming;
             entry = new Models.SiteContent
             {
                 WebsiteCode = normalized,
-                JsonContent = rawJson,
+                JsonContent = merged.ToJsonString(),
                 UpdatedAtUtc = now
             };
             _dbContext.SiteContent.Add(entry);
         }
         else
         {
-            entry.JsonContent = rawJson;
+            var existing = JsonNode.Parse(entry.JsonContent) as JsonObject ?? new JsonObject();
+            merged = MergeObjects(existing, incoming);
+            entry.JsonContent = merged.ToJsonString();
             entry.UpdatedAtUtc = now;
             _dbContext.SiteContent.Update(entry);
         }
@@ -98,8 +110,25 @@ public class SiteContentController : ControllerBase
             websiteCode = entry.WebsiteCode,
             id = entry.Id,
             updatedAtUtc = entry.UpdatedAtUtc,
-            siteContent = payload
+            siteContent = JsonDocument.Parse(entry.JsonContent).RootElement
         });
+    }
+
+    private static JsonObject MergeObjects(JsonObject target, JsonObject source)
+    {
+        foreach (var property in source)
+        {
+            if (property.Value is JsonObject sourceObj && target[property.Key] is JsonObject targetObj)
+            {
+                target[property.Key] = MergeObjects(targetObj, sourceObj);
+            }
+            else
+            {
+                target[property.Key] = property.Value?.DeepClone();
+            }
+        }
+
+        return target;
     }
 
     private static string NormalizeWebsiteCode(string value)
