@@ -7,6 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
+  <div id="saveToast" class="fixed top-4 right-4 z-50 hidden max-w-sm rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 shadow-lg">
+    <div class="font-semibold" id="toastTitle">Saved</div>
+    <div id="toastBody" class="mt-1 text-emerald-800/80">Changes are live on the public site.</div>
+  </div>
+
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
     <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 rounded-3xl bg-white border border-slate-200 shadow-sm px-6 py-5">
       <div>
@@ -15,46 +20,48 @@
       </div>
       <div class="flex flex-wrap gap-2">
         <button id="backBtn" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition">Back</button>
-        <button id="viewBtn" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition">View site</button>
+        <button id="viewBtn" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition">View live site</button>
         <button id="saveBtn" class="rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-800 transition shadow-lg shadow-slate-900/10">Save changes</button>
       </div>
     </header>
 
-    <div id="summary" class="mb-6 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-600 shadow-sm">Loading editable content...</div>
+    <div id="summary" class="mb-6 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-600 shadow-sm">Loading...</div>
 
     <section class="mb-8">
       <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Contact / Support</h2>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" id="contactGrid">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Email</label>
-          <input id="contactEmail" type="email" placeholder="hello@company.com" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+          <input id="contactEmail" type="email" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
         </div>
         <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Telegram</label>
-          <input id="contactTelegram" type="text" placeholder="@handle" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+          <input id="contactTelegram" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
         </div>
         <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Phone</label>
-          <input id="contactPhone" type="tel" placeholder="+82 ..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+          <input id="contactPhone" type="tel" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
         </div>
         <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Location</label>
-          <input id="contactLocation" type="text" placeholder="Seoul, South Korea" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Address</label>
+          <input id="contactLocation" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
         </div>
       </div>
     </section>
 
     <section class="mb-8" id="carouselSection" style="display:none;">
-      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3" id="carouselTitle">Category logo carousels</h2>
+      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Category logo carousels (images)</h2>
       <div class="grid md:grid-cols-2 gap-4" id="carouselGrid"></div>
     </section>
 
     <section class="mb-8" id="imagesSection" style="display:none;">
-      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3" id="imagesTitle">Images</h2>
+      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Images</h2>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="imageGrid"></div>
     </section>
 
     <section class="mb-6">
+      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Page text by section</h2>
+      <p class="text-sm text-slate-500 mb-4">Each block = one section. Edit English and Korean as <code class="text-xs bg-slate-200 px-1 rounded">key: text</code> lines. Do not delete keys.</p>
       <div class="space-y-4" id="editorGrid"></div>
     </section>
 
@@ -66,16 +73,25 @@
     const siteCode = (params.get('site') || 'A').toUpperCase();
     const queryApiBase = params.get('apiBase');
     const pagePath = siteCode === 'B' ? 'site-b/index.html' : 'site-a/index.html';
+    const livePath = siteCode === 'B' ? '/site-b/' : '/';
     const siteName = siteCode === 'B' ? 'Website B' : 'Website A';
     const defaultImageKeys = siteCode === 'B' ? ['Cosmetics', 'Vehicle', 'Laptop'] : [];
     const categorySections = siteCode === 'A'
       ? [
-          { code: 'VHC', label: 'Vehicles (cars)' },
+          { code: 'VHC', label: 'Vehicles' },
           { code: 'PRT', label: 'Auto parts' },
           { code: 'CSM', label: 'Cosmetics' },
           { code: 'LPT', label: 'Laptops' }
-        ]
-      : [];
+        ] : [];
+
+    const TEXT_BLOCKS = [
+      { id: 'nav', title: '1 · Navigation', keys: ['nav_cat', 'nav_process', 'nav_contact'] },
+      { id: 'hero', title: '2 · Top / Hero', keys: ['hero_eyebrow', 'hero_title', 'hero_sub', 'hero_cta', 'hero_cta2', 'meta_1', 'meta_2', 'meta_3'] },
+      { id: 'categories', title: '3 · Categories catalog', keys: ['cat_eyebrow', 'cat_title', 'cat1_name', 'cat1_desc', 'cat2_name', 'cat2_desc', 'cat3_name', 'cat3_desc', 'cat4_name', 'cat4_desc'] },
+      { id: 'process', title: '4 · Process steps', keys: ['proc_eyebrow', 'proc_title', 'step1_name', 'step1_desc', 'step2_name', 'step2_desc', 'step3_name', 'step3_desc', 'step4_name', 'step4_desc'] },
+      { id: 'why', title: '5 · Why us', keys: ['why1_name', 'why1_desc', 'why2_name', 'why2_desc', 'why3_name', 'why3_desc'] },
+      { id: 'contact_footer', title: '6 · Contact form + Footer', keys: ['ct_eyebrow', 'ct_title', 'ct_sub', 'ct_loc', 'f_name', 'f_contact', 'f_cat', 'f_msg', 'f_send', 'f_note', 'f_ok', 'footer_disclaimer'] }
+    ];
 
     if (queryApiBase) localStorage.setItem('koruz_api_base', queryApiBase);
     const token = localStorage.getItem('koruz_admin_token');
@@ -84,9 +100,10 @@
 
     let currentImages = {};
     let currentCategoryImages = { VHC: [], PRT: [], CSM: [], LPT: [] };
+    let knownKeys = new Set();
 
-    const inputClass = 'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100';
-    const cardClass = 'rounded-2xl bg-white border border-slate-200 p-4 shadow-sm';
+    const inputClass = 'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 font-mono text-sm';
+    const cardClass = 'rounded-2xl bg-white border border-slate-200 p-5 shadow-sm';
 
     function authHeaders(extra) {
       return Object.assign({ 'Authorization': 'Bearer ' + token }, extra || {});
@@ -125,36 +142,17 @@
     }
 
     async function loadOriginalTranslations() {
-      const response = await fetch(pagePath);
+      const response = await fetch(pagePath + '?v=' + Date.now());
       const html = await response.text();
       const match = html.match(/const\s+I18N\s*=\s*([\s\S]*?)\n};\s*\n\s*function\s+setLang/);
-      if (!match) throw new Error('Could not find the I18N text block in the original page.');
+      if (!match) throw new Error('Could not find I18N block.');
       return Function(`"use strict"; return (${match[1]}\n});`)();
-    }
-
-    async function loadOriginalStaticText() {
-      const response = await fetch(pagePath);
-      const html = await response.text();
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
-      const staticText = {};
-      let index = 0;
-      while (walker.nextNode()) {
-        const node = walker.currentNode;
-        const text = node.nodeValue.trim();
-        const parent = node.parentElement;
-        if (!text || !parent) continue;
-        if (parent.closest('script,style,noscript,template,[data-i18n]')) continue;
-        index += 1;
-        staticText[`static_${String(index).padStart(3, '0')}`] = text;
-      }
-      return staticText;
     }
 
     async function loadSavedContent() {
       const response = await requestApi(`/api/sitecontent/${siteCode}`);
       const data = await readJsonSafe(response);
-      if (!response.ok) throw new Error(data?.message || `Failed to load saved content (HTTP ${response.status})`);
+      if (!response.ok) throw new Error(data?.message || `Failed to load (HTTP ${response.status})`);
       return data?.siteContent || {};
     }
 
@@ -162,10 +160,6 @@
       const merged = {};
       ['en', 'ko'].forEach(lang => { merged[lang] = {...(original[lang] || {}), ...(saved[lang] || {})}; });
       return merged;
-    }
-
-    function sortedKeys(translations) {
-      return [...new Set([...Object.keys(translations.en || {}), ...Object.keys(translations.ko || {})])].sort((a, b) => a.localeCompare(b));
     }
 
     function fillContact(contact) {
@@ -192,6 +186,87 @@
       return [];
     }
 
+    function linesFromDict(dict, keys) {
+      return keys.map(k => `${k}: ${dict[k] || ''}`).join('\n');
+    }
+
+    function dictFromLines(text) {
+      const out = {};
+      String(text || '').split('\n').forEach(line => {
+        const idx = line.indexOf(':');
+        if (idx < 0) return;
+        const key = line.slice(0, idx).trim();
+        const val = line.slice(idx + 1).trim();
+        if (key) out[key] = val;
+      });
+      return out;
+    }
+
+    function renderBlocks(translations) {
+      const grid = document.getElementById('editorGrid');
+      grid.innerHTML = '';
+      knownKeys = new Set();
+
+      TEXT_BLOCKS.forEach(block => {
+        block.keys.forEach(k => knownKeys.add(k));
+        const card = document.createElement('div');
+        card.className = cardClass;
+        card.dataset.blockId = block.id;
+        card.innerHTML = `
+          <h3 class="font-bold mb-1">${block.title}</h3>
+          <p class="text-xs text-slate-500 mb-4">One field for the whole section. Keep the key names before the colon.</p>
+          <div class="grid lg:grid-cols-2 gap-4">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">English
+              <textarea data-block-lang="en" class="${inputClass} mt-2 min-h-[180px]"></textarea>
+            </label>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Korean
+              <textarea data-block-lang="ko" class="${inputClass} mt-2 min-h-[180px]"></textarea>
+            </label>
+          </div>
+        `;
+        card.querySelector('[data-block-lang="en"]').value = linesFromDict(translations.en || {}, block.keys);
+        card.querySelector('[data-block-lang="ko"]').value = linesFromDict(translations.ko || {}, block.keys);
+        grid.appendChild(card);
+      });
+
+      // leftover keys not in blocks
+      const leftover = Object.keys({...(translations.en || {}), ...(translations.ko || {})})
+        .filter(k => !knownKeys.has(k))
+        .sort();
+      if (leftover.length) {
+        const card = document.createElement('div');
+        card.className = cardClass;
+        card.dataset.blockId = 'other';
+        card.innerHTML = `
+          <h3 class="font-bold mb-1">Other keys</h3>
+          <div class="grid lg:grid-cols-2 gap-4">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">English
+              <textarea data-block-lang="en" class="${inputClass} mt-2 min-h-[120px]"></textarea>
+            </label>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Korean
+              <textarea data-block-lang="ko" class="${inputClass} mt-2 min-h-[120px]"></textarea>
+            </label>
+          </div>
+        `;
+        card.querySelector('[data-block-lang="en"]').value = linesFromDict(translations.en || {}, leftover);
+        card.querySelector('[data-block-lang="ko"]').value = linesFromDict(translations.ko || {}, leftover);
+        grid.appendChild(card);
+      }
+
+      return TEXT_BLOCKS.length;
+    }
+
+    function collectTranslations() {
+      const translations = { en: {}, ko: {} };
+      document.querySelectorAll('[data-block-id]').forEach(card => {
+        const en = dictFromLines(card.querySelector('[data-block-lang="en"]').value);
+        const ko = dictFromLines(card.querySelector('[data-block-lang="ko"]').value);
+        Object.assign(translations.en, en);
+        Object.assign(translations.ko, ko);
+      });
+      return translations;
+    }
+
     function renderCategoryCarousels(categoryImages) {
       const grid = document.getElementById('carouselGrid');
       const section = document.getElementById('carouselSection');
@@ -206,19 +281,18 @@
         card.className = cardClass;
         card.innerHTML = `
           <h3 class="font-semibold mb-1"></h3>
-          <p class="text-xs text-slate-500 mb-3">Upload logo images. Text logo marquee is not changed.</p>
+          <p class="text-xs text-slate-500 mb-3">Logo images for this category only.</p>
           <div class="flex flex-wrap gap-2 mb-3 min-h-[64px] thumb-row"></div>
           <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="block w-full text-sm text-slate-600" />
         `;
         card.querySelector('h3').textContent = `${sec.label} · ${sec.code}`;
         const thumbs = card.querySelector('.thumb-row');
-
         const redraw = () => {
           thumbs.innerHTML = '';
           currentCategoryImages[sec.code].forEach((url, index) => {
             const thumb = document.createElement('div');
             thumb.className = 'relative h-16 w-16 rounded-xl border border-slate-200 bg-slate-50 overflow-hidden';
-            thumb.innerHTML = `<img class="h-full w-full object-contain" alt="" /><button type="button" class="absolute top-1 right-1 rounded-md bg-white/90 border border-rose-200 text-rose-700 text-xs px-1.5 leading-none">×</button>`;
+            thumb.innerHTML = `<img class="h-full w-full object-contain" alt="" /><button type="button" class="absolute top-1 right-1 rounded-md bg-white/90 border border-rose-200 text-rose-700 text-xs px-1.5">×</button>`;
             thumb.querySelector('img').src = url;
             thumb.querySelector('button').addEventListener('click', () => {
               currentCategoryImages[sec.code].splice(index, 1);
@@ -228,78 +302,29 @@
           });
         };
         redraw();
-
         card.querySelector('input[type="file"]').addEventListener('change', async (event) => {
           const files = [...(event.target.files || [])];
           if (!files.length) return;
-          document.getElementById('statusMessage').textContent = `Uploading logos for ${sec.code}...`;
+          setStatus(`Uploading ${sec.code}...`);
           try {
             for (const file of files) {
               const body = new FormData();
               body.append('file', file);
               const response = await requestApi('/api/upload', { method: 'POST', body });
               const result = await readJsonSafe(response);
-              if (!response.ok) throw new Error(result?.message || `Upload failed (HTTP ${response.status})`);
+              if (!response.ok) throw new Error(result?.message || 'Upload failed');
               currentCategoryImages[sec.code].push(result.url);
             }
             redraw();
-            document.getElementById('statusMessage').textContent = `${sec.code} logos updated. Click Save changes.`;
-          } catch (error) {
-            document.getElementById('statusMessage').textContent = error.message || 'Upload failed.';
+            setStatus(`${sec.code} uploaded — click Save changes`);
+          } catch (e) {
+            setStatus(e.message || 'Upload failed');
           }
           event.target.value = '';
         });
-
         grid.appendChild(card);
       });
       return categorySections.length;
-    }
-
-    function renderEditor(translations) {
-      const grid = document.getElementById('editorGrid');
-      const title = document.createElement('h2');
-      title.className = 'text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3';
-      title.textContent = 'Translated text';
-      grid.appendChild(title);
-
-      sortedKeys(translations).forEach(key => {
-        const row = document.createElement('div');
-        row.className = cardClass + ' grid lg:grid-cols-[160px_1fr_1fr] gap-3';
-        row.dataset.key = key;
-        row.innerHTML = `
-          <div class="text-xs font-mono text-slate-400 break-all pt-2 key"></div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">English<textarea data-lang="en" class="${inputClass} mt-2 min-h-[80px]"></textarea></label>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Korean<textarea data-lang="ko" class="${inputClass} mt-2 min-h-[80px]"></textarea></label>
-        `;
-        row.querySelector('.key').textContent = key;
-        row.querySelector('[data-lang="en"]').value = translations.en?.[key] || '';
-        row.querySelector('[data-lang="ko"]').value = translations.ko?.[key] || '';
-        grid.appendChild(row);
-      });
-      return sortedKeys(translations).length;
-    }
-
-    function renderStaticEditor(originalStaticText, savedStaticText) {
-      const grid = document.getElementById('editorGrid');
-      const title = document.createElement('h2');
-      title.className = 'text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3 mt-8';
-      title.textContent = 'Static HTML text';
-      grid.appendChild(title);
-
-      const merged = {...originalStaticText, ...(savedStaticText || {})};
-      Object.keys(merged).forEach(key => {
-        const row = document.createElement('div');
-        row.className = cardClass + ' grid lg:grid-cols-[160px_1fr] gap-3';
-        row.dataset.staticKey = key;
-        row.innerHTML = `
-          <div class="text-xs font-mono text-slate-400 break-all pt-2 key"></div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Text<textarea class="${inputClass} mt-2 min-h-[70px]"></textarea></label>
-        `;
-        row.querySelector('.key').textContent = key;
-        row.querySelector('textarea').value = merged[key] || '';
-        grid.appendChild(row);
-      });
-      return Object.keys(merged).length;
     }
 
     function renderImageEditor(images) {
@@ -310,7 +335,6 @@
       if (!keys.length) { section.style.display = 'none'; return 0; }
       section.style.display = 'block';
       currentImages = { ...(images || {}) };
-
       keys.forEach(key => {
         if (!(key in currentImages)) currentImages[key] = '';
         const url = currentImages[key] || '';
@@ -325,51 +349,42 @@
         card.querySelector('h3').textContent = key;
         const img = card.querySelector('img');
         const meta = card.querySelector('.meta');
-        img.src = url || 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="160"><rect width="100%" height="100%" fill="#e8e8e8"/><text x="50%" y="50%" text-anchor="middle" fill="#888" font-family="sans-serif" font-size="14">No image</text></svg>');
-        meta.textContent = url || 'Using default image from HTML';
-
+        img.src = url || 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="160"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" text-anchor="middle" fill="#888" font-size="14">No image</text></svg>');
+        meta.textContent = url || 'Default HTML image';
         card.querySelector('input[type="file"]').addEventListener('change', async (event) => {
           const file = event.target.files?.[0];
           if (!file) return;
-          document.getElementById('statusMessage').textContent = `Uploading ${key}...`;
+          setStatus('Uploading...');
           try {
             const body = new FormData();
             body.append('file', file);
             const response = await requestApi('/api/upload', { method: 'POST', body });
             const result = await readJsonSafe(response);
-            if (!response.ok) throw new Error(result?.message || `Upload failed (HTTP ${response.status})`);
+            if (!response.ok) throw new Error(result?.message || 'Upload failed');
             currentImages[key] = result.url;
             img.src = result.url;
             meta.textContent = result.url;
-            document.getElementById('statusMessage').textContent = `${key} uploaded. Click Save changes.`;
-          } catch (error) {
-            document.getElementById('statusMessage').textContent = error.message || 'Upload failed.';
+            setStatus(`${key} uploaded — click Save`);
+          } catch (e) {
+            setStatus(e.message || 'Upload failed');
           }
         });
-
         grid.appendChild(card);
       });
       return keys.length;
     }
 
-    function collectTranslations() {
-      const translations = { en: {}, ko: {} };
-      document.querySelectorAll('[data-key]').forEach(row => {
-        const key = row.dataset.key;
-        if (!key) return;
-        row.querySelectorAll('textarea[data-lang]').forEach(input => {
-          translations[input.dataset.lang][key] = input.value;
-        });
-      });
-      return translations;
+    function setStatus(msg) {
+      document.getElementById('statusMessage').textContent = msg || '';
     }
 
-    function collectStaticText() {
-      const staticText = {};
-      document.querySelectorAll('[data-static-key]').forEach(row => {
-        staticText[row.dataset.staticKey] = row.querySelector('textarea').value;
-      });
-      return staticText;
+    function showToast(title, body) {
+      const toast = document.getElementById('saveToast');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastBody').textContent = body;
+      toast.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => toast.classList.add('hidden'), 4500);
     }
 
     async function saveSite() {
@@ -377,7 +392,8 @@
         siteName,
         contact: collectContact(),
         translations: collectTranslations(),
-        staticText: collectStaticText(),
+        // Clear broken staticText so live page stops painting random codes/logos
+        staticText: {},
         images: currentImages,
         categoryImages: currentCategoryImages
       };
@@ -388,31 +404,42 @@
       });
       const result = await readJsonSafe(response);
       if (!response.ok) throw new Error(result?.message || `Save failed (HTTP ${response.status})`);
-      document.getElementById('statusMessage').textContent = 'Saved successfully.';
+
+      setStatus('Saved ✓ — live site updated');
+      showToast('Saved successfully', 'Open the public site and hard-refresh once if CDN cached the old page.');
+
+      // force a public cache-busting probe
+      try {
+        await fetch(livePath + '?admin_save=' + Date.now(), { cache: 'no-store' });
+        await fetch('/api/sitecontent/' + siteCode + '?t=' + Date.now(), { cache: 'no-store' });
+      } catch (e) {}
     }
 
     document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'admin-dashboard.html');
-    document.getElementById('viewBtn').addEventListener('click', () => window.location.href = pagePath);
+    document.getElementById('viewBtn').addEventListener('click', () => {
+      window.open(livePath + '?v=' + Date.now(), '_blank');
+    });
     document.getElementById('saveBtn').addEventListener('click', () => {
-      document.getElementById('statusMessage').textContent = 'Saving...';
+      setStatus('Saving...');
       saveSite().catch(error => {
-        document.getElementById('statusMessage').textContent = error.message || 'Save failed.';
+        setStatus(error.message || 'Save failed');
+        showToast('Save failed', error.message || 'Try again');
+        document.getElementById('saveToast').classList.remove('border-emerald-200', 'bg-emerald-50', 'text-emerald-900');
+        document.getElementById('saveToast').classList.add('border-rose-200', 'bg-rose-50', 'text-rose-900');
       });
     });
 
-    Promise.all([loadOriginalTranslations(), loadOriginalStaticText(), loadSavedContent()])
-      .then(([originalTranslations, originalStaticText, savedContent]) => {
-        document.getElementById('editorGrid').innerHTML = '';
+    Promise.all([loadOriginalTranslations(), loadSavedContent()])
+      .then(([originalTranslations, savedContent]) => {
         fillContact(savedContent.contact || {});
         const carouselCount = renderCategoryCarousels(savedContent.categoryImages || {});
         const imageCount = renderImageEditor(savedContent.images || {});
-        const translationCount = renderEditor(mergeTranslations(originalTranslations, savedContent.translations || {}));
-        const staticCount = renderStaticEditor(originalStaticText, savedContent.staticText || {});
+        const blockCount = renderBlocks(mergeTranslations(originalTranslations, savedContent.translations || {}));
         document.getElementById('summary').textContent =
-          `Ready. ${carouselCount} category carousels · ${imageCount} images · ${translationCount} translations · ${staticCount} static texts.`;
+          `Ready · ${blockCount} text sections · ${carouselCount} logo carousels · ${imageCount} images. Static junk text is disabled.`;
       })
       .catch(error => {
-        document.getElementById('summary').textContent = error.message || 'Failed to load editable content.';
+        document.getElementById('summary').textContent = error.message || 'Failed to load.';
       });
   </script>
 </body>
