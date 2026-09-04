@@ -63,12 +63,15 @@
 
       const host = document.createElement('div');
       host.className = 'logo-marquee uploaded-category-images';
+      host.dataset.category = code;
       host.setAttribute('aria-label', code + ' category images');
       host.appendChild(buildTrack(urls));
       host.appendChild(buildTrack(urls));
       host.querySelectorAll('.logo-track')[1].classList.add('reverse');
       const existingVisual = card.querySelector('canvas, .logo-marquee');
-      if (existingVisual) existingVisual.replaceWith(host);
+      const textMarquee = card.querySelector('.logo-marquee:not(.uploaded-category-images)');
+      if (code === 'CSM' && textMarquee) textMarquee.before(host);
+      else if (existingVisual) existingVisual.replaceWith(host);
       else card.insertBefore(host, card.querySelector('h3'));
     });
   }
