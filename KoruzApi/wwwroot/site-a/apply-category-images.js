@@ -90,6 +90,7 @@
       host.querySelectorAll('.logo-track')[1].classList.add('reverse');
       const existingVisual = card.querySelector('canvas, .logo-marquee');
       const textMarquee = card.querySelector('.logo-marquee:not(.uploaded-category-images)');
+      if (code === 'CSM' && textMarquee) textMarquee.classList.add('text-category-logos');
       if (code === 'CSM' && textMarquee) textMarquee.before(host);
       else if (existingVisual) existingVisual.replaceWith(host);
       else card.insertBefore(host, card.querySelector('h3'));
