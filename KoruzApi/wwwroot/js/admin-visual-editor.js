@@ -91,6 +91,8 @@
   let currentImages = {};
   let currentCategoryImages = { VHC: [], PRT: [], CSM: [], LPT: [] };
   let dirty = false;
+  let changeVersion = 0;
+  let saveInProgress = false;
 
   if (queryApiBase) localStorage.setItem('koruz_api_base', queryApiBase);
   const token = localStorage.getItem('koruz_admin_token');
@@ -154,6 +156,7 @@
 
   function markDirty() {
     dirty = true;
+    changeVersion += 1;
     const btn = document.getElementById('saveBtn');
     if (btn && !btn.dataset.baseLabel) btn.dataset.baseLabel = btn.textContent;
     if (btn) btn.textContent = 'Save both languages *';
@@ -574,7 +577,16 @@
   }
 
   async function save() {
+    if (saveInProgress) return;
+
     flushCanvasToState(currentLang);
+    const saveVersion = changeVersion;
+    const saveButton = document.getElementById('saveBtn');
+    saveInProgress = true;
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = 'Saving...';
+    }
     setStatus('Saving both languages\u2026');
     const payload = {
       translations: { en: { ...translations.en }, ko: { ...translations.ko } },
@@ -590,15 +602,25 @@
       });
       const data = await readJsonSafe(response);
       if (!response.ok) throw new Error(data?.message || `HTTP ${response.status}`);
-      clearDirty();
+      if (changeVersion === saveVersion) clearDirty();
       setStatus('');
-      showToast('Saved', 'English and Korean are live on the public site.');
+      showToast('Saved', changeVersion === saveVersion
+        ? 'English and Korean are live on the public site.'
+        : 'Saved. New changes still need to be saved.');
       const updated = data?.updatedAtUtc ? new Date(data.updatedAtUtc).toLocaleString() : 'now';
       document.getElementById('summary').textContent =
         `${siteName} \u00b7 last saved ${updated} \u00b7 click text in the dark preview to edit \u00b7 toggle EN/KO keeps both drafts`;
     } catch (e) {
       setStatus('Save failed: ' + (e.message || e));
       showToast('Save failed', e.message || 'Unknown error');
+    } finally {
+      saveInProgress = false;
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = dirty
+          ? 'Save both languages *'
+          : (saveButton.dataset.baseLabel || 'Save both languages');
+      }
     }
   }
 
