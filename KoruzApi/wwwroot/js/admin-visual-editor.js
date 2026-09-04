@@ -183,11 +183,9 @@
     markDirty();
   }
 
-  // Always pass the language the canvas currently represents.
-  // Never flush after switching currentLang while old DOM is still on screen.
-  function flushCanvasToState(lang) {
+  function flushCanvasToState(lang, canvasId) {
     const target = lang || currentLang;
-    const canvas = document.getElementById('sectionCanvas');
+    const canvas = document.getElementById(canvasId || 'sectionCanvasEn');
     if (!canvas) return;
     canvas.querySelectorAll('[data-i18n-key]').forEach((el) => {
       const key = el.getAttribute('data-i18n-key');
@@ -324,21 +322,20 @@
 
   const RENDERERS = { nav: renderNav, hero: renderHero, categories: renderCategories, process: renderProcess, why: renderWhy, contact: renderContact };
 
-  function bindEditableEvents() {
-    const canvas = document.getElementById('sectionCanvas');
+  function bindEditableEvents(canvas, lang) {
     if (!canvas) return;
     canvas.querySelectorAll('[data-i18n-key]').forEach((el) => {
       el.addEventListener('input', () => {
         const key = el.getAttribute('data-i18n-key');
         const val = (el.innerText || el.textContent || '').replace(/\u00a0/g, ' ');
-        if (!translations[currentLang]) translations[currentLang] = {};
-        translations[currentLang][key] = val;
+        if (!translations[lang]) translations[lang] = {};
+        translations[lang][key] = val;
         markDirty();
       });
       el.addEventListener('blur', () => {
         const key = el.getAttribute('data-i18n-key');
         const val = (el.innerText || el.textContent || '').replace(/\u00a0/g, ' ').trim();
-        setT(key, val);
+        setT(key, val, lang);
         el.textContent = val;
       });
       el.addEventListener('keydown', (e) => {
@@ -351,15 +348,18 @@
   }
 
   function renderCurrentSection() {
-    // Do NOT flush here: after a language switch the DOM still shows the previous
-    // language until we replace innerHTML. Flush must happen before currentLang changes.
     const section = SECTIONS.find((s) => s.id === currentSectionId) || SECTIONS[0];
     document.getElementById('sectionTitle').textContent = section.title;
-    document.getElementById('langBadge').textContent = currentLang.toUpperCase();
     const renderer = RENDERERS[section.id] || (() => '<p class="muted">No preview</p>');
-    const canvas = document.getElementById('sectionCanvas');
-    canvas.innerHTML = renderer();
-    bindEditableEvents();
+    const canvasEn = document.getElementById('sectionCanvasEn');
+    const canvasKo = document.getElementById('sectionCanvasKo');
+    currentLang = 'en';
+    canvasEn.innerHTML = renderer();
+    bindEditableEvents(canvasEn, 'en');
+    currentLang = 'ko';
+    canvasKo.innerHTML = renderer();
+    bindEditableEvents(canvasKo, 'ko');
+    currentLang = 'en';
     document.querySelectorAll('.nav-sec').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.section === section.id);
     });
@@ -377,29 +377,13 @@
       btn.dataset.section = s.id;
       btn.textContent = s.title;
       btn.addEventListener('click', () => {
-        flushCanvasToState(currentLang);
+        flushCanvasToState('en', 'sectionCanvasEn');
+        flushCanvasToState('ko', 'sectionCanvasKo');
         currentSectionId = s.id;
         renderCurrentSection();
       });
       nav.appendChild(btn);
     });
-  }
-
-  function setLanguage(lang) {
-    if (lang !== 'en' && lang !== 'ko') return;
-        if (lang === currentLang) {
-      // Same language: still draw the section (needed on first load).
-      renderCurrentSection();
-      return;
-    }
-    // Save edits into the language that is currently on screen, then switch.
-    flushCanvasToState(currentLang);
-    currentLang = lang;
-    document.getElementById('langEn').classList.toggle('active', lang === 'en');
-    document.getElementById('langKo').classList.toggle('active', lang === 'ko');
-    document.getElementById('langEn').classList.toggle('text-slate-600', lang !== 'en');
-    document.getElementById('langKo').classList.toggle('text-slate-600', lang !== 'ko');
-    renderCurrentSection();
   }
 
   function fillContact(contact) {
@@ -567,20 +551,21 @@
         `${siteName} \u00b7 last saved ${updated} \u00b7 click text in the dark preview to edit \u00b7 toggle EN/KO keeps both drafts`;
       clearDirty();
       buildSectionNav();
-      setLanguage('en');
+      renderCurrentSection();
       setStatus('');
     } catch (e) {
       document.getElementById('summary').textContent = 'Load failed: ' + (e.message || e);
       setStatus(e.message || 'Load failed');
       buildSectionNav();
-      setLanguage('en');
+      renderCurrentSection();
     }
   }
 
   async function save() {
     if (saveInProgress) return;
 
-    flushCanvasToState(currentLang);
+    flushCanvasToState('en', 'sectionCanvasEn');
+    flushCanvasToState('ko', 'sectionCanvasKo');
     const saveVersion = changeVersion;
     const saveButton = document.getElementById('saveBtn');
     saveInProgress = true;
@@ -610,7 +595,7 @@
         : 'Saved. New changes still need to be saved.');
       const updated = data?.updatedAtUtc ? new Date(data.updatedAtUtc).toLocaleString() : 'now';
       document.getElementById('summary').textContent =
-        `${siteName} \u00b7 last saved ${updated} \u00b7 click text in the dark preview to edit \u00b7 toggle EN/KO keeps both drafts`;
+        `${siteName} \u00b7 last saved ${updated} \u00b7 edit English and Korean in their previews`;
     } catch (e) {
       setStatus('Save failed: ' + (e.message || e));
       showToast('Save failed', e.message || 'Unknown error');
@@ -625,8 +610,6 @@
     }
   }
 
-  document.getElementById('langEn').addEventListener('click', () => setLanguage('en'));
-  document.getElementById('langKo').addEventListener('click', () => setLanguage('ko'));
   document.getElementById('saveBtn').addEventListener('click', save);
   document.getElementById('backBtn').addEventListener('click', () => {
     if (dirty && !confirm('Unsaved changes. Leave anyway?')) return;

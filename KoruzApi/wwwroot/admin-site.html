@@ -84,14 +84,22 @@
 
       <main class="min-w-0 space-y-5">
         <div class="rounded-3xl border border-slate-200 shadow-sm overflow-hidden bg-white" id="canvasCard">
-          <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div class="px-5 py-3 border-b border-slate-100">
             <div>
               <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Section preview</div>
               <div class="font-bold" id="sectionTitle">—</div>
             </div>
-            <div class="text-xs text-slate-500">Click any text to edit · language: <span id="langBadge" class="font-semibold text-slate-800">EN</span></div>
           </div>
-          <div id="sectionCanvas" class="section-canvas p-6 sm:p-8 min-h-[280px]"></div>
+            <div class="grid xl:grid-cols-2 gap-px bg-slate-200">
+              <section class="min-w-0 bg-white">
+                <div class="px-5 py-3 border-b border-slate-100 text-sm font-bold">English (EN)</div>
+                <div id="sectionCanvasEn" class="section-canvas p-6 sm:p-8 min-h-[280px]"></div>
+              </section>
+              <section class="min-w-0 bg-white">
+                <div class="px-5 py-3 border-b border-slate-100 text-sm font-bold">Korean (KO)</div>
+                <div id="sectionCanvasKo" class="section-canvas p-6 sm:p-8 min-h-[280px]"></div>
+              </section>
+            </div>
         </div>
 
         <section id="contactPanel" class="rounded-3xl border border-slate-200 bg-white shadow-sm p-5 hidden">
