@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KoruzApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5146218465cee23dc20b8327ad38553ac29dd00b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9aba90cc767b32f2aa2bea420d3334614552db73")]
 [assembly: System.Reflection.AssemblyProductAttribute("KoruzApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KoruzApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

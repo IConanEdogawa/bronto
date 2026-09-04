@@ -21,21 +21,19 @@
 
   function buildTrack(urls) {
     const track = document.createElement('div');
-    track.className = 'cat-marquee-track';
+    track.className = 'logo-track';
 
     const makeSet = () => {
       const set = document.createElement('div');
-      set.className = 'cat-marquee-set';
+      set.className = 'logo-set';
       urls.forEach(url => {
-        const slot = document.createElement('div');
-        slot.className = 'cat-logo-slot';
         const img = document.createElement('img');
         img.src = url;
         img.alt = 'logo';
+        img.className = 'uploaded-logo';
         img.loading = 'lazy';
         img.decoding = 'async';
-        slot.appendChild(img);
-        set.appendChild(slot);
+        set.appendChild(img);
       });
       return set;
     };
@@ -49,19 +47,25 @@
     const source = categoryImages || {};
 
     SECTION_ORDER.forEach(code => {
-      const host = document.querySelector(`[data-cat-marquee="${code}"]`);
-      if (!host) return;
+      const card = [...document.querySelectorAll('.cat-card')].find(el =>
+        el.querySelector('.cat-code')?.textContent.trim().toUpperCase() === code
+      );
+      if (!card) return;
 
       const urls = normalizeList(source[code]);
-      host.querySelectorAll('.cat-marquee-track').forEach(el => el.remove());
+      card.querySelectorAll('.uploaded-category-images').forEach(el => el.remove());
 
-      if (!urls.length) {
-        host.dataset.hasLogos = '0';
-        return;
-      }
+      if (!urls.length) return;
 
-      host.dataset.hasLogos = '1';
+      const host = document.createElement('div');
+      host.className = 'logo-marquee uploaded-category-images';
+      host.setAttribute('aria-label', code + ' category images');
       host.appendChild(buildTrack(urls));
+      host.appendChild(buildTrack(urls));
+      host.querySelectorAll('.logo-track')[1].classList.add('reverse');
+      const existingVisual = card.querySelector('canvas, .logo-marquee');
+      if (existingVisual) existingVisual.replaceWith(host);
+      else card.insertBefore(host, card.querySelector('h3'));
     });
   }
 
