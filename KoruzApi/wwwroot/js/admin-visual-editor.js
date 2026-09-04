@@ -383,7 +383,11 @@
 
   function setLanguage(lang) {
     if (lang !== 'en' && lang !== 'ko') return;
-    if (lang === currentLang) return;
+        if (lang === currentLang) {
+      // Same language: still draw the section (needed on first load).
+      renderCurrentSection();
+      return;
+    }
     // Save edits into the language that is currently on screen, then switch.
     flushCanvasToState(currentLang);
     currentLang = lang;
