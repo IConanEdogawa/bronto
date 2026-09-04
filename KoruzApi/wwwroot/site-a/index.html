@@ -119,7 +119,7 @@
 
   /* ---------- CATEGORIES ---------- */
   .cat-grid{
-    display:grid;grid-template-columns:1fr 1fr;
+    display:grid;grid-template-columns:1fr;
     border:1px solid var(--line);
   }
   .cat-card{
@@ -127,8 +127,8 @@
     border-right:1px solid var(--line);border-bottom:1px solid var(--line);
     transition:background .4s ease;
   }
-  .cat-card:nth-child(2n){border-right:0}
-  .cat-card:nth-child(n+3){border-bottom:0}
+  .cat-card{border-right:0}
+  .cat-card:last-child{border-bottom:0}
   .cat-card:hover{background:var(--surface)}
   .cat-card canvas{width:100%;height:190px;display:block;margin-bottom:22px}
   .logo-marquee{
