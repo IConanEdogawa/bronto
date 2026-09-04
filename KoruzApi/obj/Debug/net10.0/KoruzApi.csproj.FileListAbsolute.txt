@@ -81,6 +81,6 @@ C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\u87ar3
 C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\6tll8zvj3u-{0}-ghb8nahgsl-ghb8nahgsl.gz
 C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\q7vug0of0z-{0}-n27hmthz81-n27hmthz81.gz
 C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\7rl013rv99-{0}-2fhxyuxw03-2fhxyuxw03.gz
-C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\1eohvm8ss2-{0}-j2bb9easly-j2bb9easly.gz
-C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\pfaqdcfqng-{0}-1enplcq2oe-1enplcq2oe.gz
 C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\imzi669sei-{0}-mcdfd8547b-mcdfd8547b.gz
+C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\1eohvm8ss2-{0}-ty2cf4wkqu-ty2cf4wkqu.gz
+C:\Users\conan\Downloads\project-3d\KoruzApi\obj\Debug\net10.0\compressed\pfaqdcfqng-{0}-anv1ichlw5-anv1ichlw5.gz

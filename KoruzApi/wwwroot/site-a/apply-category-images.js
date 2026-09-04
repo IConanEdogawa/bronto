@@ -72,7 +72,7 @@
   async function load() {
     for (const base of apiCandidates()) {
       try {
-        const response = await fetch(`${base}/api/sitecontent/${SITE_CODE}`);
+        const response = await fetch(`${base}/api/sitecontent/${SITE_CODE}?v=${Date.now()}`, { cache: 'no-store' });
         if (!response.ok) continue;
         localStorage.setItem('koruz_api_base', base);
         const data = await response.json();
