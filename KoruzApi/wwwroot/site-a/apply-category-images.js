@@ -1,6 +1,7 @@
 (function () {
   const SITE_CODE = 'A';
   const SECTION_ORDER = ['VHC', 'PRT', 'CSM', 'LPT'];
+  const COSMETICS_LOGOS = ['Anua', 'celimax', 'AXIS-Y', 'COSRX', 'Dr.G', 'ROUND LAB', 'BEAUTY OF JOSEON', "d'Alba", 'medicube', 'SKIN1004'];
 
   function apiCandidates() {
     const stored = localStorage.getItem('koruz_api_base') || '';
@@ -47,6 +48,25 @@
     return track;
   }
 
+  function buildTextTrack(names, reverse) {
+    const track = document.createElement('div');
+    track.className = 'logo-track' + (reverse ? ' reverse' : '');
+    const makeSet = () => {
+      const set = document.createElement('div');
+      set.className = 'logo-set';
+      names.forEach(name => {
+        const chip = document.createElement('span');
+        chip.className = 'logo-chip';
+        chip.textContent = name;
+        set.appendChild(chip);
+      });
+      return set;
+    };
+    track.appendChild(makeSet());
+    track.appendChild(makeSet());
+    return track;
+  }
+
   function applyCategoryImages(categoryImages, apiBase) {
     const source = categoryImages || {};
 
@@ -73,6 +93,15 @@
       if (code === 'CSM' && textMarquee) textMarquee.before(host);
       else if (existingVisual) existingVisual.replaceWith(host);
       else card.insertBefore(host, card.querySelector('h3'));
+
+      if (code === 'CSM' && !card.querySelector('.text-category-logos')) {
+        const textHost = document.createElement('div');
+        textHost.className = 'logo-marquee text-category-logos';
+        textHost.setAttribute('aria-label', 'Cosmetics text logos');
+        textHost.appendChild(buildTextTrack(COSMETICS_LOGOS, false));
+        textHost.appendChild(buildTextTrack(COSMETICS_LOGOS, true));
+        host.after(textHost);
+      }
     });
   }
 
