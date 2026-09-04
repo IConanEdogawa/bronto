@@ -3,444 +3,134 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BM Holdings Text Editor</title>
+  <title>BM Holdings · Visual Editor</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    [contenteditable="true"]:empty:before {
+      content: attr(data-placeholder);
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px solid #38bdf8;
+      outline-offset: 2px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .section-canvas {
+      background: #0B0B0C;
+      color: #E8E8EA;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .section-canvas .muted { color: #8E8E93; }
+    .section-canvas .dim { color: #5A5A5F; }
+    .section-canvas .white { color: #fff; }
+    .section-canvas .mono {
+      font-family: ui-monospace, monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8E8E93;
+    }
+    .editable-hit {
+      cursor: text;
+      min-width: 1ch;
+      display: inline;
+      border-bottom: 1px dashed transparent;
+      transition: border-color .15s, background .15s;
+    }
+    .editable-hit:hover {
+      border-bottom-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.06);
+    }
+    .lang-btn.active {
+      background: #0f172a;
+      color: #fff;
+    }
+    .nav-sec.active {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
   <div id="saveToast" class="fixed top-4 right-4 z-50 hidden max-w-sm rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 shadow-lg">
     <div class="font-semibold" id="toastTitle">Saved</div>
-    <div id="toastBody" class="mt-1 text-emerald-800/80">Changes are live on the public site.</div>
+    <div id="toastBody" class="mt-1 text-emerald-800/80">Both languages saved.</div>
   </div>
 
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-    <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 rounded-3xl bg-white border border-slate-200 shadow-sm px-6 py-5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5 rounded-3xl bg-white border border-slate-200 shadow-sm px-5 py-4">
       <div>
-        <div class="text-xs font-semibold tracking-[0.2em] uppercase text-slate-400">BM Holdings · Editor</div>
-        <h1 class="text-xl font-bold mt-1" id="siteLabel">Website</h1>
+        <div class="text-xs font-semibold tracking-[0.2em] uppercase text-slate-400">BM Holdings · Visual Editor</div>
+        <h1 class="text-xl font-bold mt-0.5" id="siteLabel">Website</h1>
       </div>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-0.5" role="group" aria-label="Language">
+          <button type="button" id="langEn" class="lang-btn active px-4 py-2 text-sm font-semibold rounded-lg transition">EN</button>
+          <button type="button" id="langKo" class="lang-btn px-4 py-2 text-sm font-semibold rounded-lg transition text-slate-600">KO</button>
+        </div>
         <button id="backBtn" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition">Back</button>
-        <button id="viewBtn" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition">View live site</button>
-        <button id="saveBtn" class="rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-800 transition shadow-lg shadow-slate-900/10">Save changes</button>
+        <button id="viewBtn" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition">View live</button>
+        <button id="saveBtn" class="rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-800 transition shadow-lg shadow-slate-900/10">Save both languages</button>
       </div>
     </header>
 
-    <div id="summary" class="mb-6 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-600 shadow-sm">Loading...</div>
+    <div id="summary" class="mb-4 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600 shadow-sm">Loading...</div>
 
-    <section class="mb-8">
-      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Contact / Support</h2>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Email</label>
-          <input id="contactEmail" type="email" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+    <div class="grid lg:grid-cols-[220px_1fr] gap-5">
+      <aside class="space-y-1.5" id="sectionNav"></aside>
+
+      <main class="min-w-0 space-y-5">
+        <div class="rounded-3xl border border-slate-200 shadow-sm overflow-hidden bg-white" id="canvasCard">
+          <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div>
+              <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Section preview</div>
+              <div class="font-bold" id="sectionTitle">—</div>
+            </div>
+            <div class="text-xs text-slate-500">Click any text to edit · language: <span id="langBadge" class="font-semibold text-slate-800">EN</span></div>
+          </div>
+          <div id="sectionCanvas" class="section-canvas p-6 sm:p-8 min-h-[280px]"></div>
         </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Telegram</label>
-          <input id="contactTelegram" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
-        </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Phone</label>
-          <input id="contactPhone" type="tel" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
-        </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Address</label>
-          <input id="contactLocation" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
-        </div>
-      </div>
-    </section>
 
-    <section class="mb-8" id="carouselSection" style="display:none;">
-      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Category logo carousels (images)</h2>
-      <div class="grid md:grid-cols-2 gap-4" id="carouselGrid"></div>
-    </section>
+        <section id="contactPanel" class="rounded-3xl border border-slate-200 bg-white shadow-sm p-5 hidden">
+          <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Contact / Support</h2>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Email</label>
+              <input id="contactEmail" type="email" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Telegram</label>
+              <input id="contactTelegram" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Phone</label>
+              <input id="contactPhone" type="tel" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Address</label>
+              <input id="contactLocation" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" />
+            </div>
+          </div>
+        </section>
 
-    <section class="mb-8" id="imagesSection" style="display:none;">
-      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Images</h2>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="imageGrid"></div>
-    </section>
+        <section id="carouselSection" class="rounded-3xl border border-slate-200 bg-white shadow-sm p-5 hidden">
+          <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Category logo carousels</h2>
+          <div class="grid md:grid-cols-2 gap-4" id="carouselGrid"></div>
+        </section>
 
-    <section class="mb-6">
-      <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Page text by section</h2>
-      <p class="text-sm text-slate-500 mb-4">Each block = one section. Edit English and Korean as <code class="text-xs bg-slate-200 px-1 rounded">key: text</code> lines. Do not delete keys.</p>
-      <div class="space-y-4" id="editorGrid"></div>
-    </section>
+        <section id="imagesSection" class="rounded-3xl border border-slate-200 bg-white shadow-sm p-5 hidden">
+          <h2 class="text-xs font-bold tracking-[0.15em] uppercase text-slate-400 mb-3">Images</h2>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="imageGrid"></div>
+        </section>
 
-    <div id="statusMessage" class="text-sm text-slate-500"></div>
+        <div id="statusMessage" class="text-sm text-slate-500"></div>
+      </main>
+    </div>
   </div>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const siteCode = (params.get('site') || 'A').toUpperCase();
-    const queryApiBase = params.get('apiBase');
-    const pagePath = siteCode === 'B' ? 'site-b/index.html' : 'site-a/index.html';
-    const livePath = siteCode === 'B' ? '/site-b/' : '/';
-    const siteName = siteCode === 'B' ? 'Website B' : 'Website A';
-    const defaultImageKeys = siteCode === 'B' ? ['Cosmetics', 'Vehicle', 'Laptop'] : [];
-    const categorySections = siteCode === 'A'
-      ? [
-          { code: 'VHC', label: 'Vehicles' },
-          { code: 'PRT', label: 'Auto parts' },
-          { code: 'CSM', label: 'Cosmetics' },
-          { code: 'LPT', label: 'Laptops' }
-        ] : [];
-
-    const TEXT_BLOCKS = [
-      { id: 'nav', title: '1 · Navigation', keys: ['nav_cat', 'nav_process', 'nav_contact'] },
-      { id: 'hero', title: '2 · Top / Hero', keys: ['hero_eyebrow', 'hero_title', 'hero_sub', 'hero_cta', 'hero_cta2', 'meta_1', 'meta_2', 'meta_3'] },
-      { id: 'categories', title: '3 · Categories catalog', keys: ['cat_eyebrow', 'cat_title', 'cat1_name', 'cat1_desc', 'cat2_name', 'cat2_desc', 'cat3_name', 'cat3_desc', 'cat4_name', 'cat4_desc'] },
-      { id: 'process', title: '4 · Process steps', keys: ['proc_eyebrow', 'proc_title', 'step1_name', 'step1_desc', 'step2_name', 'step2_desc', 'step3_name', 'step3_desc', 'step4_name', 'step4_desc'] },
-      { id: 'why', title: '5 · Why us', keys: ['why1_name', 'why1_desc', 'why2_name', 'why2_desc', 'why3_name', 'why3_desc'] },
-      { id: 'contact_footer', title: '6 · Contact form + Footer', keys: ['ct_eyebrow', 'ct_title', 'ct_sub', 'ct_loc', 'f_name', 'f_contact', 'f_cat', 'f_msg', 'f_send', 'f_note', 'f_ok', 'footer_disclaimer'] }
-    ];
-
-    if (queryApiBase) localStorage.setItem('koruz_api_base', queryApiBase);
-    const token = localStorage.getItem('koruz_admin_token');
-    if (!token) window.location.href = 'admin-login.html';
-    document.getElementById('siteLabel').textContent = `${siteName} (${siteCode})`;
-
-    let currentImages = {};
-    let currentCategoryImages = { VHC: [], PRT: [], CSM: [], LPT: [] };
-    let knownKeys = new Set();
-
-    const inputClass = 'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 font-mono text-sm';
-    const cardClass = 'rounded-2xl bg-white border border-slate-200 p-5 shadow-sm';
-
-    function authHeaders(extra) {
-      return Object.assign({ 'Authorization': 'Bearer ' + token }, extra || {});
-    }
-
-    function getApiCandidates() {
-      const storedApiBase = localStorage.getItem('koruz_api_base') || '';
-      const candidates = [queryApiBase, storedApiBase, window.location.protocol.startsWith('http') ? window.location.origin : '', 'http://127.0.0.1:63385', 'http://localhost:63385'];
-      return [...new Set(candidates.filter(Boolean).map(base => base.replace(/\/$/, '')))];
-    }
-
-    async function requestApi(path, options) {
-      const errors = [];
-      const opts = options || {};
-      opts.headers = authHeaders(opts.headers || {});
-      for (const base of getApiCandidates()) {
-        try {
-          const response = await fetch(`${base}${path}`, opts);
-          if ((response.status === 404 || response.status === 405) && base === window.location.origin) {
-            errors.push(`${base}: HTTP ${response.status}`);
-            continue;
-          }
-          localStorage.setItem('koruz_api_base', base);
-          return response;
-        } catch (error) {
-          errors.push(`${base}: ${error.message || 'request failed'}`);
-        }
-      }
-      throw new Error(`API is not reachable. Tried: ${errors.join('; ')}`);
-    }
-
-    async function readJsonSafe(response) {
-      const text = await response.text();
-      if (!text) return null;
-      try { return JSON.parse(text); } catch { return null; }
-    }
-
-    async function loadOriginalTranslations() {
-      const response = await fetch(pagePath + '?v=' + Date.now());
-      const html = await response.text();
-      const match = html.match(/const\s+I18N\s*=\s*([\s\S]*?)\n};\s*\n\s*function\s+setLang/);
-      if (!match) throw new Error('Could not find I18N block.');
-      return Function(`"use strict"; return (${match[1]}\n});`)();
-    }
-
-    async function loadSavedContent() {
-      const response = await requestApi(`/api/sitecontent/${siteCode}`);
-      const data = await readJsonSafe(response);
-      if (!response.ok) throw new Error(data?.message || `Failed to load (HTTP ${response.status})`);
-      return data?.siteContent || {};
-    }
-
-    function mergeTranslations(original, saved) {
-      const merged = {};
-      ['en', 'ko'].forEach(lang => { merged[lang] = {...(original[lang] || {}), ...(saved[lang] || {})}; });
-      return merged;
-    }
-
-    function fillContact(contact) {
-      const c = contact || {};
-      document.getElementById('contactEmail').value = c.email || '';
-      document.getElementById('contactTelegram').value = c.telegram || '';
-      document.getElementById('contactPhone').value = c.phone || '';
-      document.getElementById('contactLocation').value = c.location || '';
-    }
-
-    function collectContact() {
-      return {
-        email: document.getElementById('contactEmail').value.trim(),
-        telegram: document.getElementById('contactTelegram').value.trim(),
-        phone: document.getElementById('contactPhone').value.trim(),
-        location: document.getElementById('contactLocation').value.trim()
-      };
-    }
-
-    function normalizeUrlList(value) {
-      if (!value) return [];
-      if (Array.isArray(value)) return value.filter(Boolean);
-      if (typeof value === 'string' && value.trim()) return [value.trim()];
-      return [];
-    }
-
-    function linesFromDict(dict, keys) {
-      return keys.map(k => `${k}: ${dict[k] || ''}`).join('\n');
-    }
-
-    function dictFromLines(text) {
-      const out = {};
-      String(text || '').split('\n').forEach(line => {
-        const idx = line.indexOf(':');
-        if (idx < 0) return;
-        const key = line.slice(0, idx).trim();
-        const val = line.slice(idx + 1).trim();
-        if (key) out[key] = val;
-      });
-      return out;
-    }
-
-    function renderBlocks(translations) {
-      const grid = document.getElementById('editorGrid');
-      grid.innerHTML = '';
-      knownKeys = new Set();
-
-      TEXT_BLOCKS.forEach(block => {
-        block.keys.forEach(k => knownKeys.add(k));
-        const card = document.createElement('div');
-        card.className = cardClass;
-        card.dataset.blockId = block.id;
-        card.innerHTML = `
-          <h3 class="font-bold mb-1">${block.title}</h3>
-          <p class="text-xs text-slate-500 mb-4">One field for the whole section. Keep the key names before the colon.</p>
-          <div class="grid lg:grid-cols-2 gap-4">
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">English
-              <textarea data-block-lang="en" class="${inputClass} mt-2 min-h-[180px]"></textarea>
-            </label>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Korean
-              <textarea data-block-lang="ko" class="${inputClass} mt-2 min-h-[180px]"></textarea>
-            </label>
-          </div>
-        `;
-        card.querySelector('[data-block-lang="en"]').value = linesFromDict(translations.en || {}, block.keys);
-        card.querySelector('[data-block-lang="ko"]').value = linesFromDict(translations.ko || {}, block.keys);
-        grid.appendChild(card);
-      });
-
-      // leftover keys not in blocks
-      const leftover = Object.keys({...(translations.en || {}), ...(translations.ko || {})})
-        .filter(k => !knownKeys.has(k))
-        .sort();
-      if (leftover.length) {
-        const card = document.createElement('div');
-        card.className = cardClass;
-        card.dataset.blockId = 'other';
-        card.innerHTML = `
-          <h3 class="font-bold mb-1">Other keys</h3>
-          <div class="grid lg:grid-cols-2 gap-4">
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">English
-              <textarea data-block-lang="en" class="${inputClass} mt-2 min-h-[120px]"></textarea>
-            </label>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Korean
-              <textarea data-block-lang="ko" class="${inputClass} mt-2 min-h-[120px]"></textarea>
-            </label>
-          </div>
-        `;
-        card.querySelector('[data-block-lang="en"]').value = linesFromDict(translations.en || {}, leftover);
-        card.querySelector('[data-block-lang="ko"]').value = linesFromDict(translations.ko || {}, leftover);
-        grid.appendChild(card);
-      }
-
-      return TEXT_BLOCKS.length;
-    }
-
-    function collectTranslations() {
-      const translations = { en: {}, ko: {} };
-      document.querySelectorAll('[data-block-id]').forEach(card => {
-        const en = dictFromLines(card.querySelector('[data-block-lang="en"]').value);
-        const ko = dictFromLines(card.querySelector('[data-block-lang="ko"]').value);
-        Object.assign(translations.en, en);
-        Object.assign(translations.ko, ko);
-      });
-      return translations;
-    }
-
-    function renderCategoryCarousels(categoryImages) {
-      const grid = document.getElementById('carouselGrid');
-      const section = document.getElementById('carouselSection');
-      grid.innerHTML = '';
-      if (!categorySections.length) { section.style.display = 'none'; return 0; }
-      section.style.display = 'block';
-      const source = categoryImages || {};
-
-      categorySections.forEach(sec => {
-        currentCategoryImages[sec.code] = normalizeUrlList(source[sec.code]);
-        const card = document.createElement('div');
-        card.className = cardClass;
-        card.innerHTML = `
-          <h3 class="font-semibold mb-1"></h3>
-          <p class="text-xs text-slate-500 mb-3">Logo images for this category only.</p>
-          <div class="flex flex-wrap gap-2 mb-3 min-h-[64px] thumb-row"></div>
-          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="block w-full text-sm text-slate-600" />
-        `;
-        card.querySelector('h3').textContent = `${sec.label} · ${sec.code}`;
-        const thumbs = card.querySelector('.thumb-row');
-        const redraw = () => {
-          thumbs.innerHTML = '';
-          currentCategoryImages[sec.code].forEach((url, index) => {
-            const thumb = document.createElement('div');
-            thumb.className = 'relative h-16 w-16 rounded-xl border border-slate-200 bg-slate-50 overflow-hidden';
-            thumb.innerHTML = `<img class="h-full w-full object-contain" alt="" /><button type="button" class="absolute top-1 right-1 rounded-md bg-white/90 border border-rose-200 text-rose-700 text-xs px-1.5">×</button>`;
-            thumb.querySelector('img').src = url;
-            thumb.querySelector('button').addEventListener('click', () => {
-              currentCategoryImages[sec.code].splice(index, 1);
-              redraw();
-            });
-            thumbs.appendChild(thumb);
-          });
-        };
-        redraw();
-        card.querySelector('input[type="file"]').addEventListener('change', async (event) => {
-          const files = [...(event.target.files || [])];
-          if (!files.length) return;
-          setStatus(`Uploading ${sec.code}...`);
-          try {
-            for (const file of files) {
-              const body = new FormData();
-              body.append('file', file);
-              const response = await requestApi('/api/upload', { method: 'POST', body });
-              const result = await readJsonSafe(response);
-              if (!response.ok) throw new Error(result?.message || 'Upload failed');
-              currentCategoryImages[sec.code].push(result.url);
-            }
-            redraw();
-            setStatus(`${sec.code} uploaded — click Save changes`);
-          } catch (e) {
-            setStatus(e.message || 'Upload failed');
-          }
-          event.target.value = '';
-        });
-        grid.appendChild(card);
-      });
-      return categorySections.length;
-    }
-
-    function renderImageEditor(images) {
-      const grid = document.getElementById('imageGrid');
-      const section = document.getElementById('imagesSection');
-      grid.innerHTML = '';
-      const keys = [...new Set([...defaultImageKeys, ...Object.keys(images || {})])];
-      if (!keys.length) { section.style.display = 'none'; return 0; }
-      section.style.display = 'block';
-      currentImages = { ...(images || {}) };
-      keys.forEach(key => {
-        if (!(key in currentImages)) currentImages[key] = '';
-        const url = currentImages[key] || '';
-        const card = document.createElement('div');
-        card.className = cardClass;
-        card.innerHTML = `
-          <h3 class="font-semibold mb-3"></h3>
-          <img class="w-full h-40 object-cover rounded-xl bg-slate-100 mb-3" alt="" />
-          <p class="text-xs text-slate-500 mb-3 break-all meta"></p>
-          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="block w-full text-sm text-slate-600" />
-        `;
-        card.querySelector('h3').textContent = key;
-        const img = card.querySelector('img');
-        const meta = card.querySelector('.meta');
-        img.src = url || 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="160"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" text-anchor="middle" fill="#888" font-size="14">No image</text></svg>');
-        meta.textContent = url || 'Default HTML image';
-        card.querySelector('input[type="file"]').addEventListener('change', async (event) => {
-          const file = event.target.files?.[0];
-          if (!file) return;
-          setStatus('Uploading...');
-          try {
-            const body = new FormData();
-            body.append('file', file);
-            const response = await requestApi('/api/upload', { method: 'POST', body });
-            const result = await readJsonSafe(response);
-            if (!response.ok) throw new Error(result?.message || 'Upload failed');
-            currentImages[key] = result.url;
-            img.src = result.url;
-            meta.textContent = result.url;
-            setStatus(`${key} uploaded — click Save`);
-          } catch (e) {
-            setStatus(e.message || 'Upload failed');
-          }
-        });
-        grid.appendChild(card);
-      });
-      return keys.length;
-    }
-
-    function setStatus(msg) {
-      document.getElementById('statusMessage').textContent = msg || '';
-    }
-
-    function showToast(title, body) {
-      const toast = document.getElementById('saveToast');
-      document.getElementById('toastTitle').textContent = title;
-      document.getElementById('toastBody').textContent = body;
-      toast.classList.remove('hidden');
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => toast.classList.add('hidden'), 4500);
-    }
-
-    async function saveSite() {
-      const payload = {
-        siteName,
-        contact: collectContact(),
-        translations: collectTranslations(),
-        // Clear broken staticText so live page stops painting random codes/logos
-        staticText: {},
-        images: currentImages,
-        categoryImages: currentCategoryImages
-      };
-      const response = await requestApi(`/api/sitecontent/${siteCode}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const result = await readJsonSafe(response);
-      if (!response.ok) throw new Error(result?.message || `Save failed (HTTP ${response.status})`);
-
-      setStatus('Saved ✓ — live site updated');
-      showToast('Saved successfully', 'Open the public site and hard-refresh once if CDN cached the old page.');
-
-      // force a public cache-busting probe
-      try {
-        await fetch(livePath + '?admin_save=' + Date.now(), { cache: 'no-store' });
-        await fetch('/api/sitecontent/' + siteCode + '?t=' + Date.now(), { cache: 'no-store' });
-      } catch (e) {}
-    }
-
-    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'admin-dashboard.html');
-    document.getElementById('viewBtn').addEventListener('click', () => {
-      window.open(livePath + '?v=' + Date.now(), '_blank');
-    });
-    document.getElementById('saveBtn').addEventListener('click', () => {
-      setStatus('Saving...');
-      saveSite().catch(error => {
-        setStatus(error.message || 'Save failed');
-        showToast('Save failed', error.message || 'Try again');
-        document.getElementById('saveToast').classList.remove('border-emerald-200', 'bg-emerald-50', 'text-emerald-900');
-        document.getElementById('saveToast').classList.add('border-rose-200', 'bg-rose-50', 'text-rose-900');
-      });
-    });
-
-    Promise.all([loadOriginalTranslations(), loadSavedContent()])
-      .then(([originalTranslations, savedContent]) => {
-        fillContact(savedContent.contact || {});
-        const carouselCount = renderCategoryCarousels(savedContent.categoryImages || {});
-        const imageCount = renderImageEditor(savedContent.images || {});
-        const blockCount = renderBlocks(mergeTranslations(originalTranslations, savedContent.translations || {}));
-        document.getElementById('summary').textContent =
-          `Ready · ${blockCount} text sections · ${carouselCount} logo carousels · ${imageCount} images. Static junk text is disabled.`;
-      })
-      .catch(error => {
-        document.getElementById('summary').textContent = error.message || 'Failed to load.';
-      });
-  </script>
+  <script src="/js/admin-visual-editor.js"></script>
 </body>
 </html>
