@@ -1,5 +1,5 @@
 (function () {
-  var n = 4, parts = [], loaded = 0;
+  var n = 8, parts = [], loaded = 0;
   function tryRun() {
     if (loaded < n) return;
     (0, eval)(parts.join(''));
