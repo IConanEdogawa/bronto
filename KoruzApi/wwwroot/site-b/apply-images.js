@@ -28,10 +28,14 @@
     img.style.background = '#111';
   }
 
-  function applyImages(images) {
+  function resolveAssetUrl(url, apiBase) {
+    try { return new URL(url, apiBase).href; } catch (e) { return url; }
+  }
+
+  function applyImages(images, apiBase) {
     if (!images || typeof images !== 'object') return;
     Object.keys(images).forEach(key => {
-      const url = images[key];
+      const url = resolveAssetUrl(images[key], apiBase);
       if (!url) return;
       document.querySelectorAll('img').forEach(img => {
         if ((img.getAttribute('alt') || '') === key) {
@@ -51,7 +55,7 @@
 
   async function loadImages() {
     // Polish defaults immediately
-    applyImages({});
+    applyImages({}, base);
 
     for (const base of apiCandidates()) {
       try {
@@ -59,7 +63,7 @@
         if (!response.ok) continue;
         localStorage.setItem('koruz_api_base', base);
         const data = await readJson(response);
-        applyImages(data?.siteContent?.images || {});
+        applyImages(data?.siteContent?.images || {}, base);
         return;
       } catch (e) {}
     }

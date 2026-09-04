@@ -19,6 +19,10 @@
     return [];
   }
 
+  function resolveAssetUrl(url, apiBase) {
+    try { return new URL(url, apiBase).href; } catch (e) { return url; }
+  }
+
   function buildTrack(urls) {
     const track = document.createElement('div');
     track.className = 'logo-track';
@@ -43,7 +47,7 @@
     return track;
   }
 
-  function applyCategoryImages(categoryImages) {
+  function applyCategoryImages(categoryImages, apiBase) {
     const source = categoryImages || {};
 
     SECTION_ORDER.forEach(code => {
@@ -52,7 +56,7 @@
       );
       if (!card) return;
 
-      const urls = normalizeList(source[code]);
+      const urls = normalizeList(source[code]).map(url => resolveAssetUrl(url, apiBase));
       card.querySelectorAll('.uploaded-category-images').forEach(el => el.remove());
 
       if (!urls.length) return;
@@ -76,7 +80,7 @@
         if (!response.ok) continue;
         localStorage.setItem('koruz_api_base', base);
         const data = await response.json();
-        applyCategoryImages(data?.siteContent?.categoryImages || {});
+        applyCategoryImages(data?.siteContent?.categoryImages || {}, base);
         return;
       } catch (e) {}
     }
