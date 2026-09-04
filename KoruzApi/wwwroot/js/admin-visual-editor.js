@@ -353,6 +353,7 @@
     const renderer = RENDERERS[section.id] || (() => '<p class="muted">No preview</p>');
     const canvasEn = document.getElementById('sectionCanvasEn');
     const canvasKo = document.getElementById('sectionCanvasKo');
+    if (!canvasEn || !canvasKo) throw new Error('Language preview containers are missing.');
     currentLang = 'en';
     canvasEn.innerHTML = renderer();
     bindEditableEvents(canvasEn, 'en');
