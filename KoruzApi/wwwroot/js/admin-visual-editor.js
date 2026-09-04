@@ -171,8 +171,9 @@
   function t(key) {
     const langMap = translations[currentLang] || {};
     if (langMap[key] != null && langMap[key] !== '') return langMap[key];
-    const fallback = translations.en || {};
-    return fallback[key] != null ? fallback[key] : key;
+    const defaultMap = DEFAULT_I18N[currentLang] || {};
+    if (defaultMap[key] != null) return defaultMap[key];
+    return key;
   }
 
   function setT(key, value, lang) {
